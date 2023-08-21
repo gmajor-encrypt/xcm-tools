@@ -172,9 +172,9 @@ More examples can be found in the [example](./example) or [xcm_test](./tx/xcm_te
 
 ### Test
 
-``bash
+```bash
 go test -v ./...
-``
+```
 
 docker
 
