@@ -2,6 +2,8 @@ package main
 
 import (
 	. "github.com/gmajor-encrypt/xcm-tools/tx"
+	"github.com/itering/scale.go/utiles"
+	"github.com/itering/substrate-api-rpc/hasher"
 	"github.com/shopspring/decimal"
 	"log"
 )
@@ -33,8 +35,8 @@ func main() {
 	// weight set
 	weight := Weight{Limited: &WeightLimited{ProofSize: 0, RefTime: 4000000000}}
 
-	// send an ump message use limited_reserve_transfer_assets
-	callName, args := client.Ump.LimitedReserveTransferAssets(&dest, &beneficiary, &assets, 0, &weight)
+	// send an ump message use limited_teleport_assets
+	callName, args := client.Ump.LimitedTeleportAssets(&dest, &beneficiary, &assets, 0, &weight)
 
 	// sign the extrinsic
 	signed, err := client.Conn.SignTransaction(client.Ump.GetModuleName(), callName, args...)
@@ -46,4 +48,6 @@ func main() {
 	if err != nil {
 		log.Panic(err)
 	}
+
+	log.Printf("This Extrinsic has success send with hash %s", utiles.AddHex(utiles.BytesToHex(hasher.HashByCryptoName(utiles.HexToBytes(signed), "Blake2_256"))))
 }

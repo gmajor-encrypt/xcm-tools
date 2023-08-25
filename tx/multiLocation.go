@@ -31,7 +31,7 @@ type XCMJunction struct {
 	AccountId32    *XCMJunctionAccountId32    `json:"AccountId32,omitempty"`
 	AccountIndex64 *XCMJunctionAccountIndex64 `json:"AccountIndex64,omitempty"`
 	AccountKey20   *XCMJunctionAccountKey20   `json:"AccountKey20,omitempty"`
-	PalletInstance *uint                      `json:"PalletInstance,omitempty"`
+	PalletInstance *uint32                    `json:"PalletInstance,omitempty"`
 	GeneralIndex   *string                    `json:"GeneralIndex,omitempty"`
 	GeneralKey     *interface{}               `json:"GeneralKey,omitempty"`
 	OnlyChild      *interface{}               `json:"OnlyChild,omitempty"`

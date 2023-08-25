@@ -115,7 +115,7 @@ func (c *Client) getXcmLatestVersion() {
 // accountId: the account id of the beneficiary
 // amount: the amount of the asset to be transferred
 func (c *Client) SendUmpTransfer(accountId string, amount decimal.Decimal) (string, error) {
-	callName, args := c.Ump.LimitedReserveTransferAssets(
+	callName, args := c.Ump.LimitedTeleportAssets(
 		SimplifyMultiLocationRelayChain(),
 		SimplifyMultiLocationAccountId32(accountId),
 		SimplifyMultiAssets(amount),

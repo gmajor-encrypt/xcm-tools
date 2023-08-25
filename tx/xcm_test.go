@@ -33,7 +33,7 @@ func TestXcmSend(t *testing.T) {
 		}}}
 
 		weight := Weight{Limited: &WeightLimited{ProofSize: 0, RefTime: 4000000000}}
-		callName, args := client.Ump.LimitedReserveTransferAssets(&dest, &beneficiary, &assets, 0, &weight)
+		callName, args := client.Ump.LimitedTeleportAssets(&dest, &beneficiary, &assets, 0, &weight)
 
 		signed, err := client.Conn.SignTransaction(client.Ump.GetModuleName(), callName, args...)
 		assert.NoError(t, err)

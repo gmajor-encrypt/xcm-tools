@@ -151,7 +151,7 @@ func main() {
 	weight := Weight{Limited: &WeightLimited{ProofSize: 0, RefTime: 4000000000}}
 
 	// send an ump message use limited_reserve_transfer_assets
-	callName, args := client.Ump.LimitedReserveTransferAssets(&dest, &beneficiary, &assets, 0, &weight)
+	callName, args := client.Ump.LimitedTeleportAssets(&dest, &beneficiary, &assets, 0, &weight)
 
 	// sign the extrinsic
 	signed, err := client.Conn.SignTransaction(client.Ump.GetModuleName(), callName, args...)
