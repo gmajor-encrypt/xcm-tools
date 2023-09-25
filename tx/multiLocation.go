@@ -2,13 +2,55 @@ package tx
 
 import (
 	"encoding/json"
+	"fmt"
 )
 
 type VersionedMultiLocation struct {
-	V0 *V0MultiLocation `json:"V0,omitempty"`
 	V1 *V1MultiLocation `json:"V1,omitempty"`
 	V2 *V1MultiLocation `json:"V2,omitempty"`
 	V3 *V1MultiLocation `json:"V3,omitempty"`
+}
+
+func (v *VersionedMultiLocation) GetParaId() uint {
+	if v.V1 != nil {
+		return v.V1.GetParaId()
+	}
+	if v.V2 != nil {
+		return v.V2.GetParaId()
+	}
+	if v.V3 != nil {
+		return v.V3.GetParaId()
+	}
+	return 0
+}
+
+func (v *V1MultiLocation) GetParaId() uint {
+	m := v.Interior
+	var junctions map[string]XCMJunction
+	switch {
+	case m.X1 != nil:
+		junctions = map[string]XCMJunction{"col0": *m.X1}
+	case m.X2 != nil:
+		junctions = m.X2
+	case m.X3 != nil:
+		junctions = m.X3
+	case m.X4 != nil:
+		junctions = m.X4
+	case m.X5 != nil:
+		junctions = m.X5
+	case m.X6 != nil:
+		junctions = m.X6
+	case m.X7 != nil:
+		junctions = m.X7
+	case m.X8 != nil:
+		junctions = m.X8
+	}
+	for i := 0; i <= 7; i++ {
+		if junction, ok := junctions[fmt.Sprintf("col%d", i)]; ok && junction.Parachain != nil {
+			return uint(*junction.Parachain)
+		}
+	}
+	return 0
 }
 
 func (v *VersionedMultiLocation) ToScale() interface{} {

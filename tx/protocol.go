@@ -1,15 +1,15 @@
 package tx
 
-type protocol string
+type Protocol string
 
 const (
-	UMP  protocol = "UMP"
-	DMP  protocol = "DMP"
-	HRMP protocol = "HRMP"
-	XCMP protocol = "XCMP"
+	UMP  Protocol = "UMP"
+	DMP  Protocol = "DMP"
+	HRMP Protocol = "HRMP"
+	XCMP Protocol = "XCMP"
 )
 
-func NewMessage(protocol protocol) IXCMP {
+func NewMessage(protocol Protocol) IXCMP {
 	switch protocol {
 	case UMP:
 		return NewUmp()
@@ -20,5 +20,5 @@ func NewMessage(protocol protocol) IXCMP {
 	case XCMP:
 		return NewHrmp()
 	}
-	panic("invalid protocol")
+	panic("invalid Protocol")
 }

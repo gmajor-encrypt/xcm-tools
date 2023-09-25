@@ -9,11 +9,11 @@ import (
 func Test_Client(t *testing.T) {
 	client := NewClient("wss://rpc.polkadot.io")
 
-	assert.NotNil(t, client.getModule("Balances"))
-	assert.Nil(t, client.getModule("xtokens"))
+	assert.NotNil(t, GetModule("Balances", client.m))
+	assert.Nil(t, GetModule("xtokens", client.m))
 
-	assert.NotNil(t, client.getCallByName("Balances", "transfer"))
-	assert.NotNil(t, client.getCallByName("XcmPallet", "reserve_transfer_assets"))
+	assert.NotNil(t, getCallByName("Balances", "transfer", client.m))
+	assert.NotNil(t, getCallByName("XcmPallet", "reserve_transfer_assets", client.m))
 	assert.EqualValues(t, client.XcmVersion, uint(3))
 	client.Close()
 

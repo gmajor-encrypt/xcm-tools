@@ -9,8 +9,9 @@ result of the execution after sending xcm.
 
 - [x] Send VMP(UMP & HRMP) message
 - [x] Send HRMP message
-- [ ] Parse xcm message
-- [ ] Tracer xcm message result
+- [x] Parse xcm message
+- [x] Tracer xcm message result
+- [x] Cli Support
 
 ## Get Start
 

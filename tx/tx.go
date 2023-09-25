@@ -14,12 +14,13 @@ import (
 )
 
 type Client struct {
-	Conn       *rpc.Client
-	Ump        IXCMP
-	Dmp        IXCMP
-	Hrmp       IXCMP
-	XcmVersion uint
-	m          *metadata.Instant
+	Conn               *rpc.Client
+	Ump                IXCMP
+	Dmp                IXCMP
+	Hrmp               IXCMP
+	XcmVersion         uint
+	m                  *metadata.Instant
+	XcmVersionTypeName string
 }
 
 // NewClient create a new XCM client
@@ -59,8 +60,8 @@ func (c *Client) Close() {
 }
 
 // getCallByName get call by module name and call name
-func (c *Client) getCallByName(moduleName, callName string) *types.MetadataCalls {
-	module := c.getModule(moduleName)
+func getCallByName(moduleName, callName string, m *metadata.Instant) *types.MetadataCalls {
+	module := GetModule(moduleName, m)
 	if module == nil {
 		return nil
 	}
@@ -73,11 +74,11 @@ func (c *Client) getCallByName(moduleName, callName string) *types.MetadataCalls
 	return nil
 }
 
-// getModule get module by name
-func (c *Client) getModule(moduleName string) *types.MetadataModules {
-	for i, v := range c.m.Metadata.Modules {
+// GetModule get module by name
+func GetModule(moduleName string, m *metadata.Instant) *types.MetadataModules {
+	for i, v := range m.Metadata.Modules {
 		if strings.EqualFold(v.Name, moduleName) {
-			return &c.m.Metadata.Modules[i]
+			return &m.Metadata.Modules[i]
 		}
 	}
 	return nil
@@ -85,17 +86,17 @@ func (c *Client) getModule(moduleName string) *types.MetadataModules {
 
 func (c *Client) getXcmLatestVersion() {
 	moduleName := "XcmPallet"
-	if c.getModule(moduleName) == nil {
+	if GetModule(moduleName, c.m) == nil {
 		moduleName = "PolkadotXcm"
 	}
 
-	call := c.getCallByName(moduleName, "send")
+	call := getCallByName(moduleName, "send", c.m)
 
 	if call != nil {
-		versionedXcmType := call.Args[1].Type
+		c.XcmVersionTypeName = call.Args[1].Type
 
 		r := types.RuntimeType{}
-		_, value, _ := r.GetCodecClass(versionedXcmType, 0)
+		_, value, _ := r.GetCodecClass(c.XcmVersionTypeName, 0)
 
 		var mappingTypes types.TypeMapping
 		b, _ := json.Marshal(value.Elem().FieldByName("TypeMapping").Interface())

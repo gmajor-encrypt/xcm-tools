@@ -9,3 +9,10 @@ func ToInt(s string) int {
 	}
 	return 0
 }
+
+func ToUint(i string) uint {
+	if i, err := strconv.ParseUint(i, 10, 0); err == nil {
+		return uint(i)
+	}
+	return 0
+}

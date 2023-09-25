@@ -1,8 +1,24 @@
 package main
 
-import "fmt"
+import (
+	"github.com/urfave/cli"
+	"log"
+	"os"
+)
 
-// todo cli command
 func main() {
-	fmt.Println("Hello XCM tools cli")
+	app := setup()
+	if err := app.Run(os.Args); err != nil {
+		log.Fatal(err)
+	}
+}
+
+func setup() *cli.App {
+	app := cli.NewApp()
+	app.Name = "Xcm tools"
+	app.Usage = "Xcm tools"
+	app.Action = func(*cli.Context) error { return nil }
+	app.Flags = []cli.Flag{}
+	app.Commands = subCommands()
+	return app
 }

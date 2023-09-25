@@ -3,8 +3,40 @@ package tx
 import "encoding/json"
 
 type VersionedXcm struct {
+	V0 *V0 `json:"V0,omitempty"`
+	V1 *V1 `json:"V1,omitempty"`
 	V2 *V2 `json:"V2,omitempty"`
 	V3 *V3 `json:"V3,omitempty"`
+}
+
+type V0 struct {
+	WithdrawAsset             *interface{} `json:"WithdrawAsset,omitempty"`
+	ReserveAssetDeposit       *interface{} `json:"ReserveAssetDeposit,omitempty"`
+	TeleportAsset             *interface{} `json:"TeleportAsset,omitempty"`
+	QueryResponse             *interface{} `json:"QueryResponse,omitempty"`
+	TransferAsset             *interface{} `json:"TransferAsset,omitempty"`
+	TransferReserveAsset      *interface{} `json:"TransferReserveAsset,omitempty"`
+	Transact                  *interface{} `json:"Transact,omitempty"`
+	HrmpNewChannelOpenRequest *interface{} `json:"HrmpNewChannelOpenRequest,omitempty"`
+	HrmpChannelAccepted       *interface{} `json:"HrmpChannelAccepted,omitempty"`
+	HrmpChannelClosing        *interface{} `json:"HrmpChannelClosing,omitempty"`
+	RelayedFrom               *interface{} `json:"RelayedFrom,omitempty"`
+}
+
+type V1 struct {
+	WithdrawAsset             *interface{} `json:"WithdrawAsset,omitempty"`
+	ReserveAssetDeposit       *interface{} `json:"ReserveAssetDeposit,omitempty"`
+	ReceiveTeleportedAsset    *interface{} `json:"ReceiveTeleportedAsset,omitempty"`
+	QueryResponse             *interface{} `json:"QueryResponse,omitempty"`
+	TransferAsset             *interface{} `json:"TransferAsset,omitempty"`
+	TransferReserveAsset      *interface{} `json:"TransferReserveAsset,omitempty"`
+	Transact                  *interface{} `json:"Transact,omitempty"`
+	HrmpNewChannelOpenRequest *interface{} `json:"HrmpNewChannelOpenRequest,omitempty"`
+	HrmpChannelAccepted       *interface{} `json:"HrmpChannelAccepted,omitempty"`
+	HrmpChannelClosing        *interface{} `json:"HrmpChannelClosing,omitempty"`
+	RelayedFrom               *interface{} `json:"RelayedFrom,omitempty"`
+	SubscribeVersion          *interface{} `json:"SubscribeVersion,omitempty"`
+	UnsubscribeVersion        *interface{} `json:"UnsubscribeVersion,omitempty"`
 }
 
 type V2 []V2XcmInstruction
