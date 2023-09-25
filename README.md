@@ -34,6 +34,91 @@ docker build -t xcm-tools .
 go get -u github.com/gmajor-encrypt/xcm-tools  
 ```
 
+### CLI Usage
+
+XCM tools also support sending xcm messages, parsing messages, and tracking xcm transaction results through cli
+commands.
+
+```bash
+go run .  -h
+```
+
+#### Commands
+
+```
+NAME:
+   Xcm tools - Xcm tools
+
+USAGE:
+   cmd [global options] command [command options] [arguments...]
+
+COMMANDS:
+   send     send xcm message
+   parse    parse xcm message
+   tracker  tracker xcm message transaction
+   help, h  Shows a list of commands or help for one command
+
+GLOBAL OPTIONS:
+   --help, -h  show help
+```
+
+#### args
+
+| Name               | Describe                                                                      | Suitable |
+|--------------------|-------------------------------------------------------------------------------|----------|
+| dest               | Dest address                                                                  | SendXCM  |
+| amount             | Send xcm transfer amount                                                      | SendXCM  |
+| keyring            | Set sr25519 secret key                                                        | SendXCM  |
+| endpoint           | Set substrate endpoint, only support websocket protocol, like ws:// or wss:// | ALL      |
+| paraId             | Send xcm transfer amount                                                      | SendXCM  |
+| message            | Parsed xcm message raw data                                                   | Parse    |
+| extrinsicIndex     | Xcm message extrinsicIndex                                                    | Tracker  |
+| protocol           | Xcm protocol, such as UMP,HRMP,DMP                                            | Tracker  |
+| destEndpoint       | Dest chain endpoint, only support websocket protocol, like ws:// or wss://    | Tracker  |
+| relaychainEndpoint | Relay chain endpoint, only support websocket protocol, like ws:// or wss://   | Tracker  |
+
+### Parse Xcm Message
+
+We provide a function to parse xcm transaction instructions and deserialize the encoded raw message into readable JSON. Support XCM V0,V1,V2,V3.
+
+```go
+package example
+
+import (
+	"fmt"
+	"github.com/gmajor-encrypt/xcm-tools/tx"
+)
+
+func ParseMessage() {
+	client := tx.NewClient("wss://rococo-rpc.polkadot.io")
+	defer client.Close()
+	instruction, err := client.ParseXcmMessageInstruction("0x031000040000000007f5c1998d2a0a130000000007f5c1998d2a000d01020400010100ea294590dbcfac4dda7acd6256078be26183d079e2739dd1e8b1ba55d94c957a")
+	fmt.Println(instruction, err)
+}
+
+```
+
+### Tracker Xcm Message
+
+We provide a function to track xcm transaction results. Support protocol UMP,HRMP,DMP.
+
+```go
+package example
+
+import (
+	"fmt"
+	"github.com/gmajor-encrypt/xcm-tools/tracker"
+	"github.com/gmajor-encrypt/xcm-tools/tx"
+)
+
+// TrackerMessage Tracker UMP Message with extrinsic_index 4310901-13
+func TrackerMessage() {
+	event, err := tracker.TrackXcmMessage("4310901-13", tx.UMP, "wss://moonbeam.api.onfinality.io/public-ws", "wss://polkadot.api.onfinality.io/public-ws", "")
+	fmt.Println(event, err)
+}
+```
+
+
 #### Xcm Client
 
 ```go
@@ -169,7 +254,6 @@ func main() {
 ```
 
 More examples can be found in the [example](./example) or [xcm_test](./tx/xcm_test.go) directory.
-
 
 ### Test
 

@@ -8,6 +8,7 @@ import (
 
 func TestParseXcmMessageInstruction(t *testing.T) {
 	client := initClient("wss://rococo-rpc.polkadot.io")
+	defer client.Close()
 	cases := []struct {
 		Raw         string
 		Instruction string

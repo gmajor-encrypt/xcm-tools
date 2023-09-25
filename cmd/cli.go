@@ -87,7 +87,7 @@ func subCommands() []cli.Command {
 					Usage: "send dmp message",
 					Flags: []cli.Flag{
 						cli.IntFlag{
-							Name:     "para_id",
+							Name:     "paraId",
 							Usage:    "dest para id",
 							Required: true,
 						},
