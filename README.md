@@ -22,8 +22,15 @@ result of the execution after sending xcm.
 
 ### Build
 
+#### Build Docker Image
 ```bash 
-docker build -t xcm-tools .
+docker build -f Dockerfile-build -t xcm-tools .
+docker run -it xcm-tools -h
+```
+
+#### Build Binary
+```bash
+cd cmd && go build -o xcm-tools .
 ```
 
 ### Usage
@@ -31,8 +38,10 @@ docker build -t xcm-tools .
 #### Installation
 
 ```bash 
-go get -u github.com/gmajor-encrypt/xcm-tools  
+go install github.com/gmajor-encrypt/xcm-tools/cmd@latest 
 ```
+You can find binary file(cmd) in $GOPATH/bin
+
 
 ### CLI Usage
 
@@ -76,6 +85,18 @@ GLOBAL OPTIONS:
 | protocol           | Xcm protocol, such as UMP,HRMP,DMP                                            | Tracker  |
 | destEndpoint       | Dest chain endpoint, only support websocket protocol, like ws:// or wss://    | Tracker  |
 | relaychainEndpoint | Relay chain endpoint, only support websocket protocol, like ws:// or wss://   | Tracker  |
+
+#### example
+
+```bash
+#ump
+go run . send UMP --dest 0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d --amount 10 --keyring 0xe5be9a5092b81bca64be81d212e7f2f9eba183bb7a90954f7b76361f6edb5c0a --endpoint wss://rococo-asset-hub-rpc.polkadot.io
+#dmp
+go run . send DMP --dest 0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d --amount 10 --keyring 0xe5be9a5092b81bca64be81d212e7f2f9eba183bb7a90954f7b76361f6edb5c0a --endpoint wss://rococo-rpc.polkadot.io --paraId 1000
+#hrmp
+go run . send HRMP --dest 0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d --amount 10 --keyring 0xe5be9a5092b81bca64be81d212e7f2f9eba183bb7a90954f7b76361f6edb5c0a --endpoint wss://rococo-asset-hub-rpc.polkadot.io --paraId 2087
+```
+
 
 ### Parse Xcm Message
 
@@ -264,7 +285,8 @@ go test -v ./...
 docker
 
 ```bash
-docker run -it --rm xcm-tools
+docker build -t xcm-tools-test .
+docker run -it --rm xcm-tools-test
 ```
 
 ## License
