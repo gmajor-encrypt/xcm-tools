@@ -11,6 +11,7 @@ import (
 	"github.com/itering/substrate-api-rpc/metadata"
 	"github.com/itering/substrate-api-rpc/rpc"
 	"github.com/itering/substrate-api-rpc/websocket"
+	"log"
 	"strings"
 )
 
@@ -20,7 +21,9 @@ type ITracker interface {
 
 var (
 	NotfoundXcmMessageErr = errors.New("not found xcm message")
+	InvalidExtrinsic      = errors.New("invalid extrinsic")
 	InvalidDestParaId     = errors.New("invalid dest para id")
+	InvalidParaHead       = errors.New("invalid para head")
 )
 
 func CreateSnapshotClient(endpoint string) (*websocket.PoolConn, *metadata.Instant, func()) {
@@ -75,6 +78,12 @@ func hash(hex string) string {
 }
 
 func TrackXcmMessage(extrinsicIndex string, protocol tx.Protocol, originEndpoint, destEndpoint, relayEndpoint string) (*Event, error) {
+	log.Println("Start track xcm message with ExtrinsicIndex:", extrinsicIndex,
+		"Protocol:", protocol,
+		"OriginEndpoint:", originEndpoint,
+		"DestEndpoint:", destEndpoint,
+		"RelayEndpoint:", relayEndpoint)
+
 	_, metadataInstant, cancel := CreateSnapshotClient(originEndpoint)
 	chain := checkChain(metadataInstant)
 	if chain == Solo {

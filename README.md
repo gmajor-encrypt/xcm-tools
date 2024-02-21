@@ -108,12 +108,14 @@ package example
 import (
 	"fmt"
 	"github.com/gmajor-encrypt/xcm-tools/tx"
+	"github.com/gmajor-encrypt/xcm-tools/parse"
 )
 
 func ParseMessage() {
 	client := tx.NewClient("wss://rococo-rpc.polkadot.io")
 	defer client.Close()
-	instruction, err := client.ParseXcmMessageInstruction("0x031000040000000007f5c1998d2a0a130000000007f5c1998d2a000d01020400010100ea294590dbcfac4dda7acd6256078be26183d079e2739dd1e8b1ba55d94c957a")
+	p := parse.New(client.Metadata())
+	instruction, err := p.ParseXcmMessageInstruction("0x031000040000000007f5c1998d2a0a130000000007f5c1998d2a000d01020400010100ea294590dbcfac4dda7acd6256078be26183d079e2739dd1e8b1ba55d94c957a")
 	fmt.Println(instruction, err)
 }
 
@@ -176,7 +178,7 @@ import (
 // SendUmpMessage
 // Send ump message from asset-hub to rococo relay chain
 func SendUmpMessage() {
-	client := New()
+	client := tx.NewClient("endpoint")
 	beneficiary := "beneficiary Account id"
 	transferAmount := decimal.New(10000, 0) // transfer amount 
 	txHash, err := client.SendUmpTransfer(beneficiary, transferAmount)
@@ -186,7 +188,7 @@ func SendUmpMessage() {
 // SendHrmpMessage
 // Send hrmp message from rococo asset-hub to picasso-rococo testnet
 func SendHrmpMessage() {
-	client := New()
+	client :=tx.NewClient("endpoint")
 	destParaId := 2087 // destination parachain id
 	beneficiary := "beneficiary Account id"
 	transferAmount := decimal.New(10000, 0) // transfer amount 
@@ -197,7 +199,7 @@ func SendHrmpMessage() {
 // SendDmpMessage 
 // Send dmp message from rococo to asset-hub 
 func SendDmpMessage() {
-	client := New()
+	client := tx.NewClient("endpoint")
 	destParaId := 1000 // destination parachain id, rococo asset hub
 	beneficiary := "beneficiary Account id"
 	transferAmount := decimal.New(10000, 0) // transfer amount 

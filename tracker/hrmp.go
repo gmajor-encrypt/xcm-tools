@@ -2,11 +2,11 @@ package tracker
 
 import (
 	"context"
-	"encoding/json"
-	"github.com/gmajor-encrypt/xcm-tools/tx"
+	"github.com/gmajor-encrypt/xcm-tools/parse"
 	"github.com/itering/scale.go/types"
 	"github.com/itering/substrate-api-rpc/metadata"
 	"github.com/itering/substrate-api-rpc/rpc"
+	"github.com/itering/substrate-api-rpc/util"
 	"log"
 )
 
@@ -23,8 +23,9 @@ func (h *Hrmp) Track(ctx context.Context) (*Event, error) {
 
 	extrinsic := findOutBlockByExtrinsicIndex(h.extrinsicIndex)
 	if extrinsic == nil {
-		return nil, NotfoundXcmMessageErr
+		return nil, InvalidExtrinsic
 	}
+
 	blockHash, err := rpc.GetChainGetBlockHash(client.Conn, int(extrinsic.BlockNum))
 	if err != nil {
 		return nil, err
@@ -42,39 +43,46 @@ func (h *Hrmp) Track(ctx context.Context) (*Event, error) {
 	}
 
 	messageHash := event.Params[0].Value.(string)
-	log.Println("messageHash", messageHash)
+	log.Println("Find messageHash", messageHash)
 
-	extrinsics, err := getExtrinsics(ctx, client, blockHash)
+	hrmpOutboundMessages, err := HrmpOutboundMessages(blockHash)
 	if err != nil {
 		return nil, err
 	}
-	extrinsicData, err := getExtrinsicByIndex(ctx, extrinsics, int(extrinsic.Index), &metadataStruct)
-	if err != nil {
-		return nil, err
+	var (
+		messageRaw string
+		destParaId uint
+	)
+	parseClient := parse.New(metadataInstant)
+	// pick the message by messageHash
+	for _, message := range hrmpOutboundMessages {
+		for _, raw := range parseClient.DecodeFixedMessage(util.TrimHex(message.Data)[2:]) {
+			if hash(raw) == messageHash {
+				messageRaw = util.TrimHex(raw)
+				destParaId = message.Recipient
+			}
+		}
 	}
+	log.Println("Find messageRaw", messageRaw)
 
-	var multiLocation tx.VersionedMultiLocation
-	bytes, _ := json.Marshal(extrinsicData.Params[0].Value)
-	err = json.Unmarshal(bytes, &multiLocation)
+	instruction, err := parseClient.ParseXcmMessageInstruction(messageRaw)
 	if err != nil {
 		return nil, err
 	}
-	destParaId := multiLocation.GetParaId()
-	if destParaId == 0 {
-		return nil, InvalidDestParaId
-	}
+	messageId := instruction.PickoutTopicId()
+	log.Println("Find messageId, dest para id", messageId, destParaId)
 
 	nextBlockHash, err := rpc.GetChainGetBlockHash(client.Conn, int(extrinsic.BlockNum+1))
 	if err != nil {
 		return nil, err
 	}
-	log.Println("nextBlockHash", nextBlockHash)
+	log.Println("Get NextBlockHash", nextBlockHash)
 
 	relayChainBlockNum, err := HRMPWatermark(nextBlockHash)
 	if err != nil {
 		return nil, err
 	}
-	log.Println("relayChainBlockNum", relayChainBlockNum)
+	log.Println("Get RelayChainBlockNum", relayChainBlockNum)
 	closeClient()
 	types.Clean()
 
@@ -85,7 +93,7 @@ func (h *Hrmp) Track(ctx context.Context) (*Event, error) {
 		return nil, err
 	}
 
-	log.Println("relaychain blockHash", blockHash)
+	log.Println("Get Relaychain blockHash", blockHash)
 	raw, err := rpc.GetMetadataByHash(nil, nextBlockHash)
 	if err != nil {
 		return nil, err
@@ -93,7 +101,7 @@ func (h *Hrmp) Track(ctx context.Context) (*Event, error) {
 
 	metadataInstant = metadata.RegNewMetadataType(0, raw)
 	metadataStruct = types.MetadataStruct(*metadataInstant)
-	log.Println("nextBlockHash", nextBlockHash)
+	log.Println("Get NextBlockHash", nextBlockHash)
 	pendingAvailability, err := PendingAvailability(destParaId, nextBlockHash)
 	if err != nil {
 		return nil, err
@@ -101,7 +109,7 @@ func (h *Hrmp) Track(ctx context.Context) (*Event, error) {
 
 	paraHead := pendingAvailability.Descriptor.ParaHead
 
-	log.Println("get para block hash", paraHead)
+	log.Println("Get para block hash", paraHead)
 	closeClient()
 	types.Clean()
 
@@ -120,10 +128,20 @@ func (h *Hrmp) Track(ctx context.Context) (*Event, error) {
 		return nil, err
 	}
 
+	// 	xcmpQueue (Success) [messageHash, messageId, result]
 	event = findEventByEventId(events, 1, []string{"Success", "Failed"})
-	if event != nil && event.Params[0].Value.(string) == messageHash {
-		log.Printf("find HRMP messageHash %s, result %s", event.Params[0].Value.(string), event.EventId)
-		return event, nil
+	if event != nil {
+		if len(event.Params) == 2 {
+			if event.Params[0].Value.(string) == messageHash {
+				log.Printf("Find HRMP messageHash %s, result %s", messageHash, event.EventId)
+				return event, nil
+			}
+		} else if len(event.Params) == 3 {
+			if event.Params[1].Value.(string) == messageId {
+				log.Printf("Find HRMP messageHash %s,messageId %s result %s", messageHash, messageId, event.EventId)
+				return event, nil
+			}
+		}
 	}
 	return nil, nil
 }

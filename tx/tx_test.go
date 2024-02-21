@@ -12,9 +12,8 @@ func Test_Client(t *testing.T) {
 	assert.NotNil(t, GetModule("Balances", client.m))
 	assert.Nil(t, GetModule("xtokens", client.m))
 
-	assert.NotNil(t, getCallByName("Balances", "transfer", client.m))
-	assert.NotNil(t, getCallByName("XcmPallet", "reserve_transfer_assets", client.m))
-	assert.EqualValues(t, client.XcmVersion, uint(3))
+	assert.NotNil(t, GetCallByName("Balances", "transfer", client.m))
+	assert.NotNil(t, GetCallByName("XcmPallet", "reserve_transfer_assets", client.m))
 	client.Close()
 
 	// will raise panic because this network doesn't support XCM

@@ -22,7 +22,7 @@ func Test_TrackTx(t *testing.T) {
 
 	// hrmp
 	// https://polkadot.subscan.io/xcm_message/polkadot-13586a835ebe97b4e2d046233aac26657f64da04
-	event, err = TrackXcmMessage("4325642-7", tx.HRMP, "wss://astar.api.onfinality.io/public-ws", "wss://rpc.hydradx.cloud", "wss://polkadot.api.onfinality.io/public-ws")
+	event, err = TrackXcmMessage("4325642-7", tx.HRMP, "wss://astar-rpc.dwellir.com", "wss://rpc.hydradx.cloud", "wss://polkadot.api.onfinality.io/public-ws")
 	assert.NoError(t, err)
 	assert.Equal(t, "0x5d81466ae4b2d9fb1fd140cd690bb25276b0bfafabecd62840c67e0b062c8181", event.Params[0].Value.(string))
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/gmajor-encrypt/xcm-tools/parse"
 	"github.com/gmajor-encrypt/xcm-tools/tracker"
 	"github.com/gmajor-encrypt/xcm-tools/tx"
 	"github.com/itering/scale.go/utiles"
@@ -148,11 +149,12 @@ func subCommands() []cli.Command {
 			Action: func(c *cli.Context) error {
 				client := tx.NewClient(c.String("endpoint"))
 				defer client.Close()
-				xcm, err := client.ParseXcmMessageInstruction(c.String("message"))
+				p := parse.New(client.Metadata())
+				xcm, err := p.ParseXcmMessageInstruction(c.String("message"))
 				if err != nil {
 					return err
 				}
-				log.Print("parse xcm message success: ")
+				log.Println("parse xcm message success: ")
 				utiles.Debug(xcm)
 				return nil
 			},

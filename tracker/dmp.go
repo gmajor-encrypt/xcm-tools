@@ -19,9 +19,10 @@ type Dmp struct {
 func (d *Dmp) Track(ctx context.Context) (*Event, error) {
 	extrinsic := findOutBlockByExtrinsicIndex(d.extrinsicIndex)
 	if extrinsic == nil {
-		return nil, NotfoundXcmMessageErr
+		return nil, InvalidExtrinsic
 	}
 
+	// origin relay chain
 	client, metadataInstant, closeClient := CreateSnapshotClient(d.originEndpoint)
 	blockHash, err := rpc.GetChainGetBlockHash(client.Conn, int(extrinsic.BlockNum))
 
@@ -34,6 +35,7 @@ func (d *Dmp) Track(ctx context.Context) (*Event, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	event := findEventByEventId(events, extrinsic.Index, []string{"Attempted"})
 	if event == nil {
 		return nil, NotfoundXcmMessageErr
@@ -64,7 +66,7 @@ func (d *Dmp) Track(ctx context.Context) (*Event, error) {
 	if destParaId == 0 {
 		return nil, InvalidDestParaId
 	}
-	log.Println("destParaId", destParaId)
+	log.Println("Find destParaId", destParaId)
 
 	downwardMessageQueues, err := DownwardMessageQueues(destParaId, blockHash)
 	if err != nil {
@@ -79,40 +81,75 @@ func (d *Dmp) Track(ctx context.Context) (*Event, error) {
 		}
 	}
 
-	log.Println("messageHash", messageHash)
+	log.Println("Find messageHash", messageHash)
 
-	nextBlockHash, err := rpc.GetChainGetBlockHash(client.Conn, int(extrinsic.BlockNum+2))
-	if err != nil {
-		return nil, err
+	paraHeadBlockNum := int(extrinsic.BlockNum + 1)
+	var paraHead string
+	var retry int
+	for {
+		nextBlockHash, err := rpc.GetChainGetBlockHash(client.Conn, paraHeadBlockNum)
+		if err != nil {
+			return nil, err
+		}
+		log.Println("Find nextBlockHash,start fetch PendingAvailability", nextBlockHash)
+		pendingAvailability, err := PendingAvailability(destParaId, nextBlockHash)
+		if err != nil {
+			return nil, err
+		}
+		paraHead = pendingAvailability.Descriptor.ParaHead
+		retry++
+		paraHeadBlockNum++
+		if paraHead != "" || retry > 5 {
+			break
+		}
 	}
 
-	log.Println("nextBlockHash", nextBlockHash)
-	pendingAvailability, err := PendingAvailability(destParaId, nextBlockHash)
-	if err != nil {
-		return nil, err
+	if paraHead == "" {
+		return nil, InvalidParaHead
 	}
+	log.Println("Get para block hash", paraHead)
 
-	paraHead := pendingAvailability.Descriptor.ParaHead
-	log.Println("get para block hash", paraHead)
 	closeClient()
 	types.Clean()
 
+	// dest para chain
 	client, _, closeClient = CreateSnapshotClient(d.destEndpoint)
 	defer closeClient()
 	raw, err := rpc.GetMetadataByHash(nil, paraHead)
 	if err != nil {
 		return nil, err
 	}
+
 	metadataInstant = metadata.RegNewMetadataType(0, raw)
 	metadataStruct = types.MetadataStruct(*metadataInstant)
 	events, err = getEvents(ctx, client, paraHead, &metadataStruct)
 	if err != nil {
 		return nil, err
 	}
+
 	event = findEventByEventId(events, 0, []string{"ExecutedDownward"})
+	var result bool
 	if event != nil && event.Params[0].Value.(string) == messageHash {
-		result, _ := ParseAttempted(*event, 1)
-		log.Printf("find DMP messageHash %s, result %t", event.Params[0].Value.(string), result)
+		// ExecutedDownward [messageHash, messageId, result]
+		if len(event.Params) == 3 {
+			result, err = ParseAttempted(*event, 2)
+			if err != nil {
+				return nil, err
+			}
+			log.Printf("Find DMP messageHash %s messageId %s, process %t",
+				event.Params[0].Value.(string),
+				event.Params[1].Value.(string),
+				result)
+		} else {
+			// ExecutedDownward [messageHash, result]
+			result, err = ParseAttempted(*event, 1)
+			if err != nil {
+				return nil, err
+			}
+			log.Printf("Find DMP messageHash %s, process %t",
+				event.Params[0].Value.(string),
+				result)
+		}
 		return event, nil
 	}
 	return nil, nil

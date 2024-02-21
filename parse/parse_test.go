@@ -1,13 +1,14 @@
-package tx
+package parse
 
 import (
+	"github.com/gmajor-encrypt/xcm-tools/tx"
 	"github.com/itering/scale.go/utiles"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func TestParseXcmMessageInstruction(t *testing.T) {
-	client := initClient("wss://rococo-rpc.polkadot.io")
+	client := tx.NewClient("wss://rococo-rpc.polkadot.io")
 	defer client.Close()
 	cases := []struct {
 		Raw         string
@@ -42,14 +43,14 @@ func TestParseXcmMessageInstruction(t *testing.T) {
 			Instruction: "{\"V4\":[{\"ReceiveTeleportedAsset\":[{\"fun\":{\"Fungible\":\"10000000000\"},\"id\":{\"interior\":{\"Here\":\"NULL\"},\"parents\":1}}]},{\"ClearOrigin\":\"NULL\"},{\"BuyExecution\":{\"fees\":{\"fun\":{\"Fungible\":\"10000000000\"},\"id\":{\"interior\":{\"Here\":\"NULL\"},\"parents\":1}},\"weight_limit\":{\"Unlimited\":\"NULL\"}}},{\"DepositAsset\":{\"assets\":{\"Wild\":{\"AllCounted\":1}},\"beneficiary\":{\"interior\":{\"X1\":[{\"AccountId32\":{\"id\":\"0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d\",\"network\":{\"Rococo\":\"NULL\"}}}]},\"parents\":0}}},{\"SetTopic\":\"0x54d4fdcbe0c2034c399c945db38c2284bbc7eae8adbc03b753bc777c9a463d6d\"}]}",
 		},
 	}
-
+	p := New(client.Metadata())
 	for _, v := range cases {
-		instruction, err := client.ParseXcmMessageInstruction(v.Raw)
+		instruction, err := p.ParseXcmMessageInstruction(v.Raw)
 		assert.NoError(t, err)
 		assert.Equal(t, v.Instruction, utiles.ToString(instruction))
 	}
 	// Will raise MessageRawIsEmptyErr error
-	_, err := client.ParseXcmMessageInstruction("")
+	_, err := p.ParseXcmMessageInstruction("")
 	assert.ErrorIs(t, err, MessageRawIsEmptyErr)
 
 }

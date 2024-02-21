@@ -273,3 +273,22 @@ func (v *VersionedXcm) ToScale() interface{} {
 	_ = json.Unmarshal(b, &r)
 	return r
 }
+
+// PickoutTopicId pickout topic id from xcm instruction
+func (v *VersionedXcm) PickoutTopicId() string {
+	if v.V4 != nil {
+		for _, x := range *v.V4 {
+			if x.SetTopic != nil {
+				return *x.SetTopic
+			}
+		}
+	}
+	if v.V3 != nil {
+		for _, x := range *v.V3 {
+			if x.SetTopic != nil {
+				return *x.SetTopic
+			}
+		}
+	}
+	return ""
+}
