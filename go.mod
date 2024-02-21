@@ -3,7 +3,7 @@ module github.com/gmajor-encrypt/xcm-tools
 go 1.18
 
 require (
-	github.com/itering/scale.go v1.7.2
+	github.com/itering/scale.go v1.8.1
 	github.com/itering/substrate-api-rpc v0.6.1
 	github.com/shopspring/decimal v1.3.1
 	github.com/stretchr/testify v1.8.4
@@ -24,7 +24,7 @@ require (
 	github.com/pierrec/xxHash v0.1.5 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
-	golang.org/x/crypto v0.12.0 // indirect
-	golang.org/x/sys v0.11.0 // indirect
+	golang.org/x/crypto v0.19.0 // indirect
+	golang.org/x/sys v0.17.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

@@ -37,6 +37,10 @@ func TestParseXcmMessageInstruction(t *testing.T) {
 			Raw:         "0x031000040000000007f5c1998d2a0a130000000007f5c1998d2a000d01020400010100ea294590dbcfac4dda7acd6256078be26183d079e2739dd1e8b1ba55d94c957a",
 			Instruction: "{\"V3\":[{\"WithdrawAsset\":[{\"fun\":{\"Fungible\":\"182764290549\"},\"id\":{\"Concrete\":{\"interior\":{\"Here\":\"NULL\"},\"parents\":0}}}]},{\"ClearOrigin\":\"NULL\"},{\"BuyExecution\":{\"fees\":{\"id\":{\"Concrete\":{\"interior\":{\"Here\":\"NULL\"},\"parents\":0}},\"fun\":{\"Fungible\":\"182764290549\"}},\"weight_limit\":{\"Unlimited\":\"NULL\"}}},{\"DepositAsset\":{\"assets\":{\"Wild\":{\"AllCounted\":1}},\"max_assets\":0,\"beneficiary\":{\"interior\":{\"X1\":{\"AccountId32\":{\"network\":null,\"id\":\"0xea294590dbcfac4dda7acd6256078be26183d079e2739dd1e8b1ba55d94c957a\"}}},\"parents\":0}}}]}",
 		},
+		{
+			Raw:         "0x041402040100000700e40b54020a130100000700e40b5402000d0102040001010105d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d2c54d4fdcbe0c2034c399c945db38c2284bbc7eae8adbc03b753bc777c9a463d6d",
+			Instruction: "{\"V4\":[{\"ReceiveTeleportedAsset\":[{\"fun\":{\"Fungible\":\"10000000000\"},\"id\":{\"interior\":{\"Here\":\"NULL\"},\"parents\":1}}]},{\"ClearOrigin\":\"NULL\"},{\"BuyExecution\":{\"fees\":{\"fun\":{\"Fungible\":\"10000000000\"},\"id\":{\"interior\":{\"Here\":\"NULL\"},\"parents\":1}},\"weight_limit\":{\"Unlimited\":\"NULL\"}}},{\"DepositAsset\":{\"assets\":{\"Wild\":{\"AllCounted\":1}},\"beneficiary\":{\"interior\":{\"X1\":[{\"AccountId32\":{\"id\":\"0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d\",\"network\":{\"Rococo\":\"NULL\"}}}]},\"parents\":0}}},{\"SetTopic\":\"0x54d4fdcbe0c2034c399c945db38c2284bbc7eae8adbc03b753bc777c9a463d6d\"}]}",
+		},
 	}
 
 	for _, v := range cases {

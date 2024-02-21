@@ -136,7 +136,7 @@ func (c *Client) SendUmpTransfer(accountId string, amount decimal.Decimal) (stri
 // accountId: the account id of the beneficiary
 // amount: the amount of the asset to be transferred
 func (c *Client) SendDmpTransfer(paraId uint32, accountId string, amount decimal.Decimal) (string, error) {
-	callName, args := c.Dmp.LimitedReserveTransferAssets(
+	callName, args := c.Dmp.LimitedTeleportAssets(
 		SimplifyMultiLocationParaId(paraId),
 		SimplifyMultiLocationAccountId32(accountId),
 		SimplifyMultiAssets(amount),
