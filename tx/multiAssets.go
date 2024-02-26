@@ -13,7 +13,7 @@ type MultiAssets struct {
 }
 
 type V2MultiAssets V1MultiAssets
-type V3MultiAssets V1MultiAssets
+type V3MultiAssets V3MultiAsset
 
 type V0MultiAssets struct {
 	None                Enum `json:"None,omitempty"`
@@ -51,11 +51,20 @@ type V1MultiAssets struct {
 	Fun AssetsFun `json:"fun"` // Fungibility
 }
 
+type V3MultiAsset struct {
+	Id  AssetsIdV3 `json:"id"`  // AssetId
+	Fun AssetsFun  `json:"fun"` // Fungibility
+}
+
 type AssetsId struct {
 	Concrete *V1MultiLocation `json:"Concrete,omitempty"`
 	Abstract *string          `json:"Abstract,omitempty"`
 }
 
+type AssetsIdV3 struct {
+	Concrete *V3MultiLocation `json:"Concrete,omitempty"`
+	Abstract *string          `json:"Abstract,omitempty"`
+}
 type AssetsFun struct {
 	Fungible    *decimal.Decimal `json:"Fungible,omitempty"`
 	NonFungible *AssetInstance   `json:"NonFungible,omitempty"`

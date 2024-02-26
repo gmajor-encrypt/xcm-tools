@@ -47,7 +47,7 @@ func TestXcmSend(t *testing.T) {
 
 	t.Run("Test_XCM_HRMP_Send", func(t *testing.T) {
 		var destParaId uint32 = 2087
-		dest := VersionedMultiLocation{V3: &V1MultiLocation{Interior: V0MultiLocation{X1: &XCMJunction{Parachain: &destParaId}}, Parents: 1}}
+		dest := VersionedMultiLocation{V3: &V3MultiLocation{Interior: V3MultiLocationJunctions{X1: &XCMJunctionV3{Parachain: &destParaId}}, Parents: 1}}
 
 		beneficiary := VersionedMultiLocation{V2: &V1MultiLocation{Interior: V0MultiLocation{
 			X1: &XCMJunction{AccountId32: &XCMJunctionAccountId32{Network: Enum{"Any": "NULL"}, Id: DestAccountId}},
@@ -72,10 +72,10 @@ func Test_XCM_Dmp_Send(t *testing.T) {
 	client := initClient("wss://rococo-rpc.polkadot.io")
 	defer client.Close()
 	var destParaId uint32 = 1000
-	dest := VersionedMultiLocation{V3: &V1MultiLocation{Interior: V0MultiLocation{X1: &XCMJunction{Parachain: &destParaId}}, Parents: 0}}
+	dest := VersionedMultiLocation{V3: &V3MultiLocation{Interior: V3MultiLocationJunctions{X1: &XCMJunctionV3{Parachain: &destParaId}}, Parents: 0}}
 
-	beneficiary := VersionedMultiLocation{V3: &V1MultiLocation{
-		Interior: V0MultiLocation{X1: &XCMJunction{AccountId32: &XCMJunctionAccountId32{Network: map[string]string{"Rococo": ""}, Id: DestAccountId}}},
+	beneficiary := VersionedMultiLocation{V3: &V3MultiLocation{
+		Interior: V3MultiLocationJunctions{X1: &XCMJunctionV3{AccountId32: &XCMJunctionV3AccountId32{Id: DestAccountId}}},
 		Parents:  0,
 	}}
 	amount := transferAmount

@@ -1,0 +1,136 @@
+package util
+
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+)
+
+const (
+	EtherscanAPIBaseURL = "https://api-sepolia.etherscan.io/api"
+	EtherscanAPIKey     = "5D91FZ48V3XPNV58ZSNAYBBWS14K3GGSZC"
+)
+
+type EtherscanProxyRes[T any] struct {
+	Jsonrpc string `json:"jsonrpc"`
+	Id      int    `json:"id"`
+	Result  T      `json:"result"`
+}
+
+type EtherscanTransaction struct {
+	BlockHash            string        `json:"blockHash"`
+	BlockNumber          string        `json:"blockNumber"`
+	From                 string        `json:"from"`
+	Gas                  string        `json:"gas"`
+	GasPrice             string        `json:"gasPrice"`
+	MaxFeePerGas         string        `json:"maxFeePerGas"`
+	MaxPriorityFeePerGas string        `json:"maxPriorityFeePerGas"`
+	Hash                 string        `json:"hash"`
+	Input                string        `json:"input"`
+	Nonce                string        `json:"nonce"`
+	To                   string        `json:"to"`
+	TransactionIndex     string        `json:"transactionIndex"`
+	Value                string        `json:"value"`
+	Type                 string        `json:"type"`
+	AccessList           []interface{} `json:"accessList"`
+	ChainId              string        `json:"chainId"`
+	V                    string        `json:"v"`
+	R                    string        `json:"r"`
+	S                    string        `json:"s"`
+	YParity              string        `json:"yParity"`
+}
+
+// EthGetTransactionByHash returns the transaction details by hash
+// eth_getTransactionByHash
+func EthGetTransactionByHash(ctx context.Context, hash string) (*EtherscanTransaction, error) {
+	var endpoint = EtherscanAPIBaseURL + "?module=proxy&action=eth_getTransactionByHash&txhash=" + hash + "&apikey=" + EtherscanAPIKey
+	body, err := HttpGet(ctx, endpoint)
+	if err != nil {
+		return nil, err
+	}
+	var txn EtherscanProxyRes[EtherscanTransaction]
+	if err = json.Unmarshal(body, &txn); err != nil {
+		return nil, err
+	}
+	return &txn.Result, nil
+}
+
+type EtherscanTransactionReceipt struct {
+	BlockHash         string          `json:"blockHash"`
+	BlockNumber       string          `json:"blockNumber"`
+	ContractAddress   interface{}     `json:"contractAddress"`
+	CumulativeGasUsed string          `json:"cumulativeGasUsed"`
+	EffectiveGasPrice string          `json:"effectiveGasPrice"`
+	From              string          `json:"from"`
+	GasUsed           string          `json:"gasUsed"`
+	Logs              []EthReceiptLog `json:"logs"`
+	LogsBloom         string          `json:"logsBloom"`
+	Status            string          `json:"status"`
+	To                string          `json:"to"`
+	TransactionHash   string          `json:"transactionHash"`
+	TransactionIndex  string          `json:"transactionIndex"`
+	Type              string          `json:"type"`
+}
+
+type EthReceiptLog struct {
+	Address          string   `json:"address"`
+	Topics           []string `json:"topics"`
+	Data             string   `json:"data"`
+	BlockNumber      string   `json:"blockNumber"`
+	TransactionHash  string   `json:"transactionHash"`
+	TransactionIndex string   `json:"transactionIndex"`
+	BlockHash        string   `json:"blockHash"`
+	LogIndex         string   `json:"logIndex"`
+	Removed          bool     `json:"removed"`
+}
+
+// EthGetTransactionReceipt returns the transaction receipt by hash
+// eth_getTransactionReceipt
+func EthGetTransactionReceipt(ctx context.Context, hash string) (*EtherscanTransactionReceipt, error) {
+	var endpoint = EtherscanAPIBaseURL + "?module=proxy&action=eth_getTransactionReceipt&txhash=" + hash + "&apikey=" + EtherscanAPIKey
+	body, err := HttpGet(ctx, endpoint)
+	if err != nil {
+		return nil, err
+	}
+	var txn EtherscanProxyRes[EtherscanTransactionReceipt]
+	if err = json.Unmarshal(body, &txn); err != nil {
+		return nil, err
+	}
+	return &txn.Result, nil
+}
+
+type EtherscanBlock struct {
+	Difficulty       string        `json:"difficulty"`
+	ExtraData        string        `json:"extraData"`
+	GasLimit         string        `json:"gasLimit"`
+	GasUsed          string        `json:"gasUsed"`
+	Hash             string        `json:"hash"`
+	LogsBloom        string        `json:"logsBloom"`
+	Miner            string        `json:"miner"`
+	MixHash          string        `json:"mixHash"`
+	Nonce            string        `json:"nonce"`
+	Number           string        `json:"number"`
+	ParentHash       string        `json:"parentHash"`
+	ReceiptsRoot     string        `json:"receiptsRoot"`
+	Sha3Uncles       string        `json:"sha3Uncles"`
+	Size             string        `json:"size"`
+	StateRoot        string        `json:"stateRoot"`
+	Timestamp        string        `json:"timestamp"`
+	TotalDifficulty  string        `json:"totalDifficulty"`
+	TransactionsRoot string        `json:"transactionsRoot"`
+	Uncles           []interface{} `json:"uncles"`
+}
+
+func EthGetBlockByNum(ctx context.Context, blockNum uint64) (*EtherscanBlock, error) {
+	// https://api.etherscan.io/api?module=proxy&action=eth_getBlockByNumber&tag=0x10d4f&boolean=false&apikey=YourApiKeyToken
+	var endpoint = EtherscanAPIBaseURL + "?module=proxy&action=eth_getBlockByNumber&tag=0x" + fmt.Sprintf("%x", blockNum) + "&boolean=false&apikey=" + EtherscanAPIKey
+	body, err := HttpGet(ctx, endpoint)
+	if err != nil {
+		return nil, err
+	}
+	var block EtherscanProxyRes[EtherscanBlock]
+	if err = json.Unmarshal(body, &block); err != nil {
+		return nil, err
+	}
+	return &block.Result, nil
+}

@@ -28,6 +28,12 @@ func (h Hrmp) TeleportAssets(dest *VersionedMultiLocation, beneficiary *Versione
 	return "teleport_assets", []interface{}{dest.ToScale(), beneficiary.ToScale(), assets.ToScale(), feeAssetItem}
 }
 
+// TransferAssets
+// (dest VersionedMultiLocation, beneficiary VersionedMultiLocation, assets VersionedMultiAssets, feeAssetItem u32, weightLimit Weight)
+func (h Hrmp) TransferAssets(dest *VersionedMultiLocation, beneficiary *VersionedMultiLocation, assets *MultiAssets, feeAssetItem uint, weightLimit *Weight) (string, []interface{}) {
+	return "transfer_assets", []interface{}{dest.ToScale(), beneficiary.ToScale(), assets.ToScale(), feeAssetItem, weightLimit.ToScale()}
+}
+
 func NewHrmp() *Hrmp {
 	return &Hrmp{ModuleName: "PolkadotXcm"}
 }

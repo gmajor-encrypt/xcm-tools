@@ -28,6 +28,12 @@ func (d Dmp) Send(location *VersionedMultiLocation, i *VersionedXcm) (string, []
 	return "send", []interface{}{location.ToScale(), i.ToScale()}
 }
 
+// TransferAssets
+// (dest VersionedMultiLocation, beneficiary VersionedMultiLocation, assets VersionedMultiAssets, feeAssetItem u32, weightLimit Weight)
+func (d Dmp) TransferAssets(*VersionedMultiLocation, *VersionedMultiLocation, *MultiAssets, uint, *Weight) (string, []interface{}) {
+	panic("dmp does not support TransferAssets")
+}
+
 func NewDmp() *Dmp {
 	return &Dmp{ModuleName: "XcmPallet"}
 }

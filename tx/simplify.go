@@ -5,9 +5,9 @@ import "github.com/shopspring/decimal"
 // SimplifyMultiLocationParaId Simplify paraId to VersionedMultiLocation
 func SimplifyMultiLocationParaId(paraId uint32) *VersionedMultiLocation {
 	return &VersionedMultiLocation{
-		V3: &V1MultiLocation{
-			Interior: V0MultiLocation{
-				X1: &XCMJunction{
+		V3: &V3MultiLocation{
+			Interior: V3MultiLocationJunctions{
+				X1: &XCMJunctionV3{
 					Parachain: &paraId,
 				},
 			},
@@ -61,6 +61,25 @@ func SimplifyMultiAssets(amount decimal.Decimal) *MultiAssets {
 					Fungible: &amount,
 				},
 			},
+		},
+	}
+}
+
+func SimplifyEthereumAssets(chainId uint64, tokenContract string, amount decimal.Decimal) V3MultiAssets {
+	return V3MultiAssets{
+		Id: AssetsIdV3{
+			Concrete: &V3MultiLocation{
+				Interior: V3MultiLocationJunctions{
+					X2: map[string]XCMJunctionV3{
+						"col0": {GlobalConsensus: &GlobalConsensusNetworkId{Ethereum: &chainId}},
+						"col1": {AccountKey20: &XCMJunctionV3AccountKey20{Key: tokenContract}},
+					},
+				},
+				Parents: 2,
+			},
+		},
+		Fun: AssetsFun{
+			Fungible: &amount,
 		},
 	}
 }

@@ -128,6 +128,35 @@ func subCommands() []cli.Command {
 						return nil
 					},
 				},
+				{
+					Name:  "EthBridge",
+					Usage: "send to ethereum",
+					Flags: append([]cli.Flag{
+						cli.Uint64Flag{
+							Name:     "chainId",
+							Usage:    "ethereum chain id",
+							Required: true,
+						},
+						cli.StringFlag{
+							Name:     "contract",
+							Usage:    "erc20 contract address",
+							Required: true,
+						},
+					}, sendFlag...),
+					Action: func(c *cli.Context) error {
+						client := tx.NewClient(c.String("endpoint"))
+						defer client.Close()
+						client.SetKeyRing(c.String("keyring"))
+						beneficiary := c.String("dest")
+						transferAmount := decimal.RequireFromString(c.String("amount"))
+						txHash, err := client.SendTokenToEthereum(beneficiary, c.String("contract"), transferAmount, c.Uint64("chainId"))
+						if err != nil {
+							return err
+						}
+						log.Print("send HRMP message success, tx hash: ", txHash)
+						return nil
+					},
+				},
 			},
 		},
 		{

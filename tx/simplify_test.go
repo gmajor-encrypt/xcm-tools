@@ -35,11 +35,11 @@ func Test_SimplifyMultiLocationParaId(t *testing.T) {
 	}{
 		{
 			paraId:   200,
-			expected: &VersionedMultiLocation{V3: &V1MultiLocation{Interior: V0MultiLocation{X1: &XCMJunction{Parachain: &[]uint32{200}[0]}}, Parents: 0}},
+			expected: &VersionedMultiLocation{V3: &V3MultiLocation{Interior: V3MultiLocationJunctions{X1: &XCMJunctionV3{Parachain: &[]uint32{200}[0]}}, Parents: 0}},
 		},
 		{
 			paraId:   300,
-			expected: &VersionedMultiLocation{V3: &V1MultiLocation{Interior: V0MultiLocation{X1: &XCMJunction{Parachain: &[]uint32{300}[0]}}, Parents: 0}},
+			expected: &VersionedMultiLocation{V3: &V3MultiLocation{Interior: V3MultiLocationJunctions{X1: &XCMJunctionV3{Parachain: &[]uint32{300}[0]}}, Parents: 0}},
 		},
 	}
 	for _, v := range cases {

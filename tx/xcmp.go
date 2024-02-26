@@ -27,5 +27,13 @@ type IXCMP interface {
 	// Send [dest,message]
 	Send(*VersionedMultiLocation, *VersionedXcm) (string, []interface{})
 
+	// TransferAssets
+	// Transfer some assets from the local chain to the destination chain through their local,
+	// destination or remote reserve, or through teleports.
+	// [dest, beneficiary, assets, feeAssetItem, weightLimit]
+	TransferAssets(*VersionedMultiLocation, *VersionedMultiLocation, *MultiAssets, uint, *Weight) (string, []interface{})
+
+	// GetModuleName
+	// Extrinsics module name
 	GetModuleName() string
 }

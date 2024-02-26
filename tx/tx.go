@@ -134,7 +134,27 @@ func (c *Client) SendHrmpTransfer(paraId uint32, accountId string, amount decima
 		0,
 		SimplifyUnlimitedWeight(),
 	)
-	signed, err := c.Conn.SignTransaction(c.Ump.GetModuleName(), callName, args...)
+	signed, err := c.Conn.SignTransaction(c.Hrmp.GetModuleName(), callName, args...)
+	if err != nil {
+		return "", err
+	}
+	tx, err := c.Conn.SendAuthorSubmitExtrinsic(signed)
+	return tx, err
+}
+
+func (c *Client) SendTokenToEthereum(h160, tokenContract string, amount decimal.Decimal, chainId uint64) (string, error) {
+	callName, args := c.Hrmp.TransferAssets(
+		&VersionedMultiLocation{V3: &V3MultiLocation{
+			Interior: V3MultiLocationJunctions{X1: &XCMJunctionV3{GlobalConsensus: &GlobalConsensusNetworkId{Ethereum: &chainId}}}, Parents: 2,
+		}},
+		&VersionedMultiLocation{V3: &V3MultiLocation{
+			Interior: V3MultiLocationJunctions{X1: &XCMJunctionV3{AccountKey20: &XCMJunctionV3AccountKey20{Key: h160}}}, Parents: 0,
+		}},
+		&MultiAssets{V3: []V3MultiAssets{SimplifyEthereumAssets(chainId, tokenContract, amount)}},
+		0,
+		SimplifyUnlimitedWeight(),
+	)
+	signed, err := c.Conn.SignTransaction(c.Hrmp.GetModuleName(), callName, args...)
 	if err != nil {
 		return "", err
 	}

@@ -21,7 +21,7 @@ func (u Ump) Send(location *VersionedMultiLocation, i *VersionedXcm) (string, []
 }
 
 // LimitedReserveTransferAssets
-// (dest VersionedMultiLocation, beneficiary VersionedMultiLocation, assets VersionedMultiAssets, fee_asset_item u32, weight_limit WeightLimit)
+// (dest VersionedMultiLocation, beneficiary VersionedMultiLocation, assets VersionedMultiAssets, fee_asset_item u32, weight_limit Weight)
 func (u Ump) LimitedReserveTransferAssets(dest *VersionedMultiLocation, beneficiary *VersionedMultiLocation, assets *MultiAssets, feeAssetItem uint, weightLimit *Weight) (string, []interface{}) {
 	return "limited_reserve_transfer_assets", []interface{}{dest.ToScale(), beneficiary.ToScale(), assets.ToScale(), feeAssetItem, weightLimit.ToScale()}
 }
@@ -33,7 +33,7 @@ func (u Ump) ReserveTransferAssets(dest *VersionedMultiLocation, beneficiary *Ve
 }
 
 // LimitedTeleportAssets
-// (dest VersionedMultiLocation, beneficiary VersionedMultiLocation, assets VersionedMultiAssets, fee_asset_item u32, weight_limit WeightLimit)
+// (dest VersionedMultiLocation, beneficiary VersionedMultiLocation, assets VersionedMultiAssets, fee_asset_item u32, weight_limit Weight)
 func (u Ump) LimitedTeleportAssets(dest *VersionedMultiLocation, beneficiary *VersionedMultiLocation, assets *MultiAssets, feeAssetItem uint, weightLimit *Weight) (string, []interface{}) {
 	return "limited_teleport_assets", []interface{}{dest.ToScale(), beneficiary.ToScale(), assets.ToScale(), feeAssetItem, weightLimit.ToScale()}
 }
@@ -42,4 +42,10 @@ func (u Ump) LimitedTeleportAssets(dest *VersionedMultiLocation, beneficiary *Ve
 // (dest VersionedMultiLocation, beneficiary VersionedMultiLocation, assets VersionedMultiAssets, fee_asset_item u32)
 func (u Ump) TeleportAssets(dest *VersionedMultiLocation, beneficiary *VersionedMultiLocation, assets *MultiAssets, feeAssetItem uint) (string, []interface{}) {
 	return "teleport_assets", []interface{}{dest.ToScale(), beneficiary.ToScale(), assets.ToScale(), feeAssetItem}
+}
+
+// TransferAssets
+// (dest VersionedMultiLocation, beneficiary VersionedMultiLocation, assets VersionedMultiAssets, feeAssetItem u32, weightLimit Weight)
+func (u Ump) TransferAssets(dest *VersionedMultiLocation, beneficiary *VersionedMultiLocation, assets *MultiAssets, feeAssetItem uint, weightLimit *Weight) (string, []interface{}) {
+	panic("ump does not support TransferAssets")
 }

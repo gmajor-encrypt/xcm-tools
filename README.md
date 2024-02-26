@@ -12,6 +12,8 @@ result of the execution after sending xcm.
 - [x] Parse xcm message
 - [x] Tracer xcm message result
 - [x] Cli Support
+- [x] XCM V2,V3,V4 Support
+- [ ] Ethereum <=> Polkadot Bridge support
 
 ## Get Start
 
@@ -188,11 +190,11 @@ func SendUmpMessage() {
 // SendHrmpMessage
 // Send hrmp message from rococo asset-hub to picasso-rococo testnet
 func SendHrmpMessage() {
-	client :=tx.NewClient("endpoint")
+	client := tx.NewClient("endpoint")
 	destParaId := 2087 // destination parachain id
 	beneficiary := "beneficiary Account id"
 	transferAmount := decimal.New(10000, 0) // transfer amount 
-	txHash, err := client.SendHrmpTransfer(destParaId, beneficiary, transferAmount)
+	txHash, err := client.SendHrmpTransfer(uint32(destParaId), beneficiary, transferAmount)
 	fmt.Println(txHash, err)
 }
 
@@ -203,7 +205,7 @@ func SendDmpMessage() {
 	destParaId := 1000 // destination parachain id, rococo asset hub
 	beneficiary := "beneficiary Account id"
 	transferAmount := decimal.New(10000, 0) // transfer amount 
-	txHash, err := client.SendDmpTransfer(destParaId, beneficiary, transferAmount)
+	txHash, err := client.SendDmpTransfer(uint32(destParaId), beneficiary, transferAmount)
 	fmt.Println(txHash, err)
 }
 
@@ -229,6 +231,7 @@ package main
 import (
 	. "github.com/gmajor-encrypt/xcm-tools/tx"
 	"github.com/shopspring/decimal"
+	"github.com/itering/substrate-api-rpc/hasher"
 	"log"
 )
 
@@ -259,7 +262,7 @@ func main() {
 	// weight set
 	weight := Weight{Limited: &WeightLimited{ProofSize: 0, RefTime: 4000000000}}
 
-	// send an ump message use limited_reserve_transfer_assets
+	// send an ump message use limited_teleport_assets
 	callName, args := client.Ump.LimitedTeleportAssets(&dest, &beneficiary, &assets, 0, &weight)
 
 	// sign the extrinsic
@@ -272,6 +275,8 @@ func main() {
 	if err != nil {
 		log.Panic(err)
 	}
+
+	log.Printf("This Extrinsic has success send with hash %s", utiles.AddHex(utiles.BytesToHex(hasher.HashByCryptoName(utiles.HexToBytes(signed), "Blake2_256"))))
 }
 
 ```

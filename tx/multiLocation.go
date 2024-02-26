@@ -8,7 +8,7 @@ import (
 type VersionedMultiLocation struct {
 	V1 *V1MultiLocation `json:"V1,omitempty"`
 	V2 *V1MultiLocation `json:"V2,omitempty"`
-	V3 *V1MultiLocation `json:"V3,omitempty"`
+	V3 *V3MultiLocation `json:"V3,omitempty"`
 }
 
 func (v *VersionedMultiLocation) GetParaId() uint {
@@ -65,19 +65,39 @@ type V1MultiLocation struct {
 	Parents  uint            `json:"parents"`
 }
 
+type V3MultiLocation struct {
+	Interior V3MultiLocationJunctions `json:"interior"`
+	Parents  uint                     `json:"parents"`
+}
+
 type Enum map[string]string
 
 type XCMJunction struct {
-	Parent         *string                    `json:"Parent,omitempty"`
-	Parachain      *uint32                    `json:"Parachain,omitempty"`
-	AccountId32    *XCMJunctionAccountId32    `json:"AccountId32,omitempty"`
-	AccountIndex64 *XCMJunctionAccountIndex64 `json:"AccountIndex64,omitempty"`
-	AccountKey20   *XCMJunctionAccountKey20   `json:"AccountKey20,omitempty"`
-	PalletInstance *uint32                    `json:"PalletInstance,omitempty"`
-	GeneralIndex   *string                    `json:"GeneralIndex,omitempty"`
-	GeneralKey     *interface{}               `json:"GeneralKey,omitempty"`
-	OnlyChild      *interface{}               `json:"OnlyChild,omitempty"`
-	Plurality      *map[string]interface{}    `json:"Plurality,omitempty"`
+	Parent          *string                    `json:"Parent,omitempty"`
+	Parachain       *uint32                    `json:"Parachain,omitempty"`
+	AccountId32     *XCMJunctionAccountId32    `json:"AccountId32,omitempty"`
+	AccountIndex64  *XCMJunctionAccountIndex64 `json:"AccountIndex64,omitempty"`
+	AccountKey20    *XCMJunctionAccountKey20   `json:"AccountKey20,omitempty"`
+	PalletInstance  *uint32                    `json:"PalletInstance,omitempty"`
+	GeneralIndex    *string                    `json:"GeneralIndex,omitempty"`
+	GeneralKey      *interface{}               `json:"GeneralKey,omitempty"`
+	OnlyChild       *interface{}               `json:"OnlyChild,omitempty"`
+	Plurality       *map[string]interface{}    `json:"Plurality,omitempty"`
+	GlobalConsensus *GlobalConsensusNetworkId  `json:"GlobalConsensus,omitempty"`
+}
+
+type XCMJunctionV3 struct {
+	Parent          *string                      `json:"Parent,omitempty"`
+	Parachain       *uint32                      `json:"Parachain,omitempty"`
+	AccountId32     *XCMJunctionV3AccountId32    `json:"AccountId32,omitempty"`
+	AccountIndex64  *XCMJunctionV3AccountIndex64 `json:"AccountIndex64,omitempty"`
+	AccountKey20    *XCMJunctionV3AccountKey20   `json:"AccountKey20,omitempty"`
+	PalletInstance  *uint32                      `json:"PalletInstance,omitempty"`
+	GeneralIndex    *string                      `json:"GeneralIndex,omitempty"`
+	GeneralKey      *interface{}                 `json:"GeneralKey,omitempty"`
+	OnlyChild       *interface{}                 `json:"OnlyChild,omitempty"`
+	Plurality       *map[string]interface{}      `json:"Plurality,omitempty"`
+	GlobalConsensus *GlobalConsensusNetworkId    `json:"GlobalConsensus,omitempty"`
 }
 
 type XCMJunctionAccountId32 struct {
@@ -85,14 +105,29 @@ type XCMJunctionAccountId32 struct {
 	Id      string `json:"id"`
 }
 
+type XCMJunctionV3AccountId32 struct {
+	Network *GlobalConsensusNetworkId `json:"network,omitempty"`
+	Id      string                    `json:"id"`
+}
+
 type XCMJunctionAccountIndex64 struct {
 	Network Enum `json:"network"`
 	Index   uint `json:"index"`
 }
 
+type XCMJunctionV3AccountIndex64 struct {
+	Network *GlobalConsensusNetworkId `json:"network,omitempty"`
+	Index   uint                      `json:"index"`
+}
+
 type XCMJunctionAccountKey20 struct {
 	Network Enum   `json:"network"`
 	Key     string `json:"key"`
+}
+
+type XCMJunctionV3AccountKey20 struct {
+	Network *GlobalConsensusNetworkId `json:"network,omitempty"`
+	Key     string                    `json:"key"`
 }
 
 type V0MultiLocation struct {
@@ -106,6 +141,19 @@ type V0MultiLocation struct {
 	X6   map[string]XCMJunction `json:"X6,omitempty"`
 	X7   map[string]XCMJunction `json:"X7,omitempty"`
 	X8   map[string]XCMJunction `json:"X8,omitempty"`
+}
+
+type V3MultiLocationJunctions struct {
+	Here string                   `json:"Here,omitempty"`
+	NULL string                   `json:"NULL,omitempty"`
+	X1   *XCMJunctionV3           `json:"X1,omitempty"`
+	X2   map[string]XCMJunctionV3 `json:"X2,omitempty"`
+	X3   map[string]XCMJunctionV3 `json:"X3,omitempty"`
+	X4   map[string]XCMJunctionV3 `json:"X4,omitempty"`
+	X5   map[string]XCMJunctionV3 `json:"X5,omitempty"`
+	X6   map[string]XCMJunctionV3 `json:"X6,omitempty"`
+	X7   map[string]XCMJunctionV3 `json:"X7,omitempty"`
+	X8   map[string]XCMJunctionV3 `json:"X8,omitempty"`
 }
 
 func (v *VersionedMultiLocation) UnmarshalJSON(data []byte) error {
@@ -128,4 +176,47 @@ func (v *VersionedMultiLocation) UnmarshalJSON(data []byte) error {
 	type T VersionedMultiLocation
 	b, _ := json.Marshal(r)
 	return json.Unmarshal(b, (*T)(v))
+}
+
+// GlobalConsensusNetworkId xcm junction network id
+type GlobalConsensusNetworkId struct {
+	ByGenesis        *string `json:"ByGenesis,omitempty"`
+	Polkadot         *string `json:"Polkadot,omitempty"`
+	Kusama           *string `json:"Kusama,omitempty"`
+	Westend          *string `json:"Westend,omitempty"`
+	Rococo           *string `json:"Rococo,omitempty"`
+	Wococo           *string `json:"Wococo,omitempty"`
+	Ethereum         *uint64 `json:"Ethereum,omitempty"`
+	BitcoinCore      *string `json:"BitcoinCore,omitempty"`
+	BitcoinCash      *string `json:"BitcoinCash,omitempty"`
+	PolkadotBulletin *string `json:"PolkadotBulletin,omitempty"`
+}
+
+func (v *V3MultiLocation) GetParaId() uint {
+	m := v.Interior
+	var junctions map[string]XCMJunctionV3
+	switch {
+	case m.X1 != nil:
+		junctions = map[string]XCMJunctionV3{"col0": *m.X1}
+	case m.X2 != nil:
+		junctions = m.X2
+	case m.X3 != nil:
+		junctions = m.X3
+	case m.X4 != nil:
+		junctions = m.X4
+	case m.X5 != nil:
+		junctions = m.X5
+	case m.X6 != nil:
+		junctions = m.X6
+	case m.X7 != nil:
+		junctions = m.X7
+	case m.X8 != nil:
+		junctions = m.X8
+	}
+	for i := 0; i <= 7; i++ {
+		if junction, ok := junctions[fmt.Sprintf("col%d", i)]; ok && junction.Parachain != nil {
+			return uint(*junction.Parachain)
+		}
+	}
+	return 0
 }
