@@ -10,6 +10,7 @@ var SubscanEndpoint = map[string]string{
 	"polkadot":          "https://polkadot.api.subscan.io",
 	"kusama":            "https://kusama.api.subscan.io",
 	"assethub-rococo":   "https://assethub-rococo.api.subscan.io",
+	"bridgehub-rococo":  "https://bridgehub-rococo.api.subscan.io",
 	"assethub-kusama":   "https://assethub-kusama.api.subscan.io",
 	"assethub-polkadot": "https://assethub-polkadot.api.subscan.io",
 }

@@ -1,6 +1,7 @@
 package tracker
 
 import (
+	"context"
 	"github.com/gmajor-encrypt/xcm-tools/tx"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -25,4 +26,24 @@ func Test_TrackTx(t *testing.T) {
 	event, err = TrackXcmMessage("4325642-7", tx.HRMP, "wss://astar-rpc.dwellir.com", "wss://rpc.hydradx.cloud", "wss://polkadot.api.onfinality.io/public-ws")
 	assert.NoError(t, err)
 	assert.Equal(t, "0x5d81466ae4b2d9fb1fd140cd690bb25276b0bfafabecd62840c67e0b062c8181", event.Params[0].Value.(string))
+}
+
+func TestTrackBridgeMessage(t *testing.T) {
+	ctx := context.Background()
+	var err error
+	// _, err := TrackBridgeMessage(ctx, &TrackBridgeMessageOptions{
+	// 	Tx:                "0x799f01445e2be3103a1a751e33b395c4b894529ce3b320d2fd94c22d4e3d6e01",
+	// 	ChainId:           0,
+	// 	BridgeHubEndpoint: "",
+	// })
+	// assert.NoError(t, err)
+
+	_, err = TrackBridgeMessage(ctx, &TrackBridgeMessageOptions{
+		ChainId:           0,
+		extrinsicIndex:    "3879712-2",
+		BridgeHubEndpoint: "wss://rococo-bridge-hub-rpc.polkadot.io",
+		originEndpoint:    "wss://rococo-rockmine-rpc.polkadot.io",
+		relayEndpoint:     "wss://rococo-rpc.polkadot.io",
+	})
+	assert.NoError(t, err)
 }

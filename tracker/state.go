@@ -65,3 +65,19 @@ func HrmpOutboundMessages(blockHash string) (list []OutboundMessage, err error) 
 	raw.ToAny(&list)
 	return
 }
+
+func SystemNumber(blockHash string) (int64, error) {
+	raw, err := rpc.ReadStorage(nil, "System", "Number", blockHash)
+	if err != nil {
+		return 0, err
+	}
+	return raw.ToInt64(), nil
+}
+
+func timestampNow(blockHash string) (int64, error) {
+	raw, err := rpc.ReadStorage(nil, "Timestamp", "Now", blockHash)
+	if err != nil {
+		return 0, err
+	}
+	return raw.ToInt64(), nil
+}

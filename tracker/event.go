@@ -21,6 +21,7 @@ type Event struct {
 	ModuleId     string       `json:"module_id"  `
 	EventId      string       `json:"event_id" `
 	Params       []EventParam `json:"params"`
+	BlockTime    int64        `json:"block_time"`
 }
 
 type EventParam struct {
