@@ -8,7 +8,7 @@ import (
 )
 
 func Test_getExtrinsics(t *testing.T) {
-	client, _, closeClient := CreateSnapshotClient("wss://moonbeam.api.onfinality.io/public-ws")
+	client, _, closeClient := CreateSnapshotClient("wss://moonbeam-rpc.dwellir.com")
 	defer closeClient()
 	ctx := context.TODO()
 	cases := []struct {
@@ -32,7 +32,7 @@ func Test_getExtrinsics(t *testing.T) {
 }
 
 func Test_getExtrinsicByIndex(t *testing.T) {
-	_, metadataInstant, closeClient := CreateSnapshotClient("wss://moonbeam.api.onfinality.io/public-ws")
+	_, metadataInstant, closeClient := CreateSnapshotClient("wss://moonbeam-rpc.dwellir.com")
 	defer closeClient()
 	ctx := context.TODO()
 	metadataStruct := types.MetadataStruct(*metadataInstant)

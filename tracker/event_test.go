@@ -8,7 +8,7 @@ import (
 )
 
 func Test_getEventsFromChain(t *testing.T) {
-	client, _, closeClient := CreateSnapshotClient("wss://moonbeam.api.onfinality.io/public-ws")
+	client, _, closeClient := CreateSnapshotClient("wss://moonbeam-rpc.dwellir.com")
 	defer closeClient()
 	ctx := context.TODO()
 	cases := []struct {
@@ -32,7 +32,7 @@ func Test_getEventsFromChain(t *testing.T) {
 }
 
 func Test_getEvents(t *testing.T) {
-	client, metadataInstant, closeClient := CreateSnapshotClient("wss://moonbeam.api.onfinality.io/public-ws")
+	client, metadataInstant, closeClient := CreateSnapshotClient("wss://moonbeam-rpc.dwellir.com")
 	defer closeClient()
 	ctx := context.TODO()
 	cases := []struct {

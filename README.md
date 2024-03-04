@@ -138,7 +138,7 @@ import (
 
 // TrackerMessage Tracker UMP Message with extrinsic_index 4310901-13
 func TrackerMessage() {
-	event, err := tracker.TrackXcmMessage("4310901-13", tx.UMP, "wss://moonbeam.api.onfinality.io/public-ws", "wss://polkadot.api.onfinality.io/public-ws", "")
+	event, err := tracker.TrackXcmMessage("4310901-13", tx.UMP, "wss://moonbeam-rpc.dwellir.com", "wss://polkadot-rpc.dwellir.com", "")
 	fmt.Println(event, err)
 }
 ```
