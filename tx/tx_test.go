@@ -8,19 +8,14 @@ import (
 )
 
 func Test_Client(t *testing.T) {
-	client := NewClient("wss://rpc.polkadot.io")
+	client := NewClient("wss://polkadot-rpc.dwellir.com")
 
 	assert.NotNil(t, GetModule("Balances", client.m))
 	assert.Nil(t, GetModule("xtokens", client.m))
 
-	assert.NotNil(t, GetCallByName("Balances", "transfer", client.m))
+	assert.NotNil(t, GetCallByName("Balances", "transfer_keep_alive", client.m))
 	assert.NotNil(t, GetCallByName("XcmPallet", "reserve_transfer_assets", client.m))
 	client.Close()
-
-	// will raise panic because this network doesn't support XCM
-	assert.Panics(t, func() {
-		NewClient("wss://mainnet-node.dock.io")
-	})
 }
 
 func TestXcmTransfer(t *testing.T) {

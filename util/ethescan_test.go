@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/stretchr/testify/assert"
 	"testing"
+	"time"
 )
 
 func Test_EthGetTransactionByHash(t *testing.T) {
@@ -122,6 +123,7 @@ func Test_EthGetBlockByNum(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		time.Sleep(1 * time.Second)
 		got, err := EthGetBlockByNum(tt.args.ctx, tt.args.blockNum)
 		if !errors.Is(err, tt.err) {
 			t.Errorf("Test_EthGetBlockByNum() error = %v, wantErr %v", err, tt.err)

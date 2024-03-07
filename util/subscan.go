@@ -15,6 +15,12 @@ var SubscanEndpoint = map[string]string{
 	"assethub-polkadot": "https://assethub-polkadot.api.subscan.io",
 }
 
+const SubscanAPIKey = "98802de223864e7987d3266b3af6e521"
+
+var subscanApiHeaders = map[string]string{
+	"X-API-Key": SubscanAPIKey,
+}
+
 type SubscanRes[T any] struct {
 	Code    int    `json:"code"`
 	Message string `json:"message"`
@@ -36,7 +42,7 @@ func SubscanGetBlockByTime(ctx context.Context, network string, blockTime uint) 
 
 	params := map[string]interface{}{"block_timestamp": blockTime, "only_head": true}
 	paramsBytes, _ := json.Marshal(params)
-	data, err := HttpPost(ctx, paramsBytes, url)
+	data, err := HttpPost(ctx, paramsBytes, url, subscanApiHeaders)
 	if err != nil {
 		return nil, err
 	}
@@ -93,7 +99,7 @@ func SubscanGetEvents(ctx context.Context, network string, params *SubscanEventR
 		return nil, fmt.Errorf("network not supported")
 	}
 	paramsBytes, _ := json.Marshal(params)
-	data, err := HttpPost(ctx, paramsBytes, url)
+	data, err := HttpPost(ctx, paramsBytes, url, subscanApiHeaders)
 	if err != nil {
 		return nil, err
 	}
@@ -108,7 +114,7 @@ func SubscanGetEvents(ctx context.Context, network string, params *SubscanEventR
 
 	paramsBytes, _ = json.Marshal(map[string]interface{}{"event_index": eventIndex})
 	url = SubscanEndpoint[network] + "/api/scan/event/params"
-	data, err = HttpPost(ctx, paramsBytes, url)
+	data, err = HttpPost(ctx, paramsBytes, url, subscanApiHeaders)
 	if err != nil {
 		return nil, err
 	}
