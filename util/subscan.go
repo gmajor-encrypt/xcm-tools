@@ -111,7 +111,9 @@ func SubscanGetEvents(ctx context.Context, network string, params *SubscanEventR
 	for _, event := range r.Data.Events {
 		eventIndex = append(eventIndex, event.EventIndex)
 	}
-
+	if len(eventIndex) == 0 {
+		return nil, nil
+	}
 	paramsBytes, _ = json.Marshal(map[string]interface{}{"event_index": eventIndex})
 	url = SubscanEndpoint[network] + "/api/scan/event/params"
 	data, err = HttpPost(ctx, paramsBytes, url, subscanApiHeaders)

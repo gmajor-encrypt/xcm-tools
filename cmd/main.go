@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"github.com/gmajor-encrypt/xcm-tools/parse"
 	"github.com/gmajor-encrypt/xcm-tools/tracker"
@@ -221,6 +222,51 @@ func subCommands() []cli.Command {
 			},
 			Action: func(c *cli.Context) error {
 				_, err := tracker.TrackXcmMessage(c.String("extrinsicIndex"), tx.Protocol(c.String("protocol")), c.String("endpoint"), c.String("destEndpoint"), c.String("relaychainEndpoint"))
+				if err != nil {
+					return err
+				}
+				return nil
+			},
+		},
+		{
+			Name:  "trackerBridge",
+			Usage: "tracker snowBridge message transaction",
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:  "extrinsicIndex",
+					Usage: "xcm message extrinsicIndex, it is polkadot to ethereum xcm message extrinsic index",
+				},
+				cli.StringFlag{
+					Name:  "hash",
+					Usage: "ethereum send token to polkadot transaction hash, if not empty, will ignore extrinsicIndex",
+				},
+				cli.StringFlag{
+					Name:     "bridgeHubEndpoint",
+					Usage:    "BridgeHubEndpoint endpoint, only support websocket protocol, like ws:// or wss://",
+					Required: true,
+				},
+				cli.StringFlag{
+					Name:     "relaychainEndpoint",
+					Usage:    "relay chain endpoint, only support websocket protocol, like ws:// or wss://",
+					Required: false,
+				},
+				cli.StringFlag{
+					Name:     "endpoint",
+					Usage:    "Set substrate endpoint, only support websocket protocol, like ws:// or wss://",
+					EnvVar:   "ENDPOINT",
+					Required: true,
+				},
+			},
+			Action: func(c *cli.Context) error {
+				_, err := tracker.TrackBridgeMessage(
+					context.Background(),
+					&tracker.TrackBridgeMessageOptions{
+						Tx:                c.String("hash"),
+						ExtrinsicIndex:    c.String("extrinsicIndex"),
+						BridgeHubEndpoint: c.String("bridgeHubEndpoint"),
+						OriginEndpoint:    c.String("endpoint"),
+						RelayEndpoint:     c.String("relaychainEndpoint"),
+					})
 				if err != nil {
 					return err
 				}

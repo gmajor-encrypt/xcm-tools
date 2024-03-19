@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/stretchr/testify/assert"
+	"strings"
 	"testing"
 	"time"
 )
@@ -134,6 +135,44 @@ func Test_EthGetBlockByNum(t *testing.T) {
 			assert.Equal(t, got.Number, tt.want.Number)
 			assert.Equal(t, got.ParentHash, tt.want.ParentHash)
 			assert.Equal(t, got.Timestamp, tt.want.Timestamp)
+		}
+	}
+}
+
+func TestEtherscanGetLogs(t *testing.T) {
+	type args struct {
+		ctx       context.Context
+		fromBlock uint64
+		address   string
+		topic0    string
+		page      uint64
+		offset    uint64
+	}
+	tests := []struct {
+		args args
+		want *EtherscanLog
+		err  error
+	}{
+		{
+			args: args{ctx: context.Background(),
+				fromBlock: 0,
+				address:   "0x5B4909cE6Ca82d2CE23BD46738953c7959E710Cd",
+				topic0:    "0x617fdb0cb78f01551a192a3673208ec5eb09f20a90acf673c63a0dcb11745a7a",
+				page:      1, offset: 1},
+			want: &EtherscanLog{
+				Address: strings.ToLower("0x5B4909cE6Ca82d2CE23BD46738953c7959E710Cd"),
+				Topics:  []string{"0x"},
+			},
+		},
+	}
+	for _, tt := range tests {
+		got, err := EtherscanGetLogs(tt.args.ctx, tt.args.fromBlock, tt.args.address, tt.args.topic0, tt.args.page, tt.args.offset)
+		if !errors.Is(err, tt.err) {
+			t.Errorf("EtherscanGetLogs() error = %v, wantErr %v", err, tt.err)
+			return
+		}
+		if got != nil {
+			assert.Equal(t, got[0].Address, tt.want.Address)
 		}
 	}
 }

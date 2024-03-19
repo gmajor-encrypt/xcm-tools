@@ -31,19 +31,14 @@ func Test_TrackTx(t *testing.T) {
 func TestTrackBridgeMessage(t *testing.T) {
 	ctx := context.Background()
 	var err error
-	// _, err := TrackBridgeMessage(ctx, &TrackBridgeMessageOptions{
-	// 	Tx:                "0x799f01445e2be3103a1a751e33b395c4b894529ce3b320d2fd94c22d4e3d6e01",
-	// 	ChainId:           0,
-	// 	BridgeHubEndpoint: "",
-	// })
-	// assert.NoError(t, err)
+	_, err = TrackBridgeMessage(ctx, &TrackBridgeMessageOptions{Tx: "0x799f01445e2be3103a1a751e33b395c4b894529ce3b320d2fd94c22d4e3d6e01"})
+	assert.NoError(t, err)
 
 	_, err = TrackBridgeMessage(ctx, &TrackBridgeMessageOptions{
-		ChainId:           0,
-		extrinsicIndex:    "3879712-2",
+		ExtrinsicIndex:    "3879712-2",
 		BridgeHubEndpoint: "wss://rococo-bridge-hub-rpc.polkadot.io",
-		originEndpoint:    "wss://rococo-rockmine-rpc.polkadot.io",
-		relayEndpoint:     "wss://rococo-rpc.polkadot.io",
+		OriginEndpoint:    "wss://rococo-rockmine-rpc.polkadot.io",
+		RelayEndpoint:     "wss://rococo-rpc.polkadot.io",
 	})
 	assert.NoError(t, err)
 }

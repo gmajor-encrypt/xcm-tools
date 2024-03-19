@@ -172,7 +172,7 @@ type EtherscanLog struct {
 
 func EtherscanGetLogs(ctx context.Context, fromBlock uint64, address, topic0 string, page uint64, offset uint64) ([]EtherscanLog, error) {
 	// https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=12878196&topic0=0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef&page=1&offset=1&apikey=YourApiKeyToken
-	var endpoint = EtherscanAPIBaseURL + "?module=logs&action=getLogs&fromBlock=" + fmt.Sprintf("%d", fromBlock) + "&topic0=" + topic0 + "&page=" + fmt.Sprintf("%d", page) + "&offset=" + fmt.Sprintf("%d", offset) + "&apikey=" + EtherscanAPIKey
+	var endpoint = EtherscanAPIBaseURL + "?module=logs&action=getLogs&fromBlock=" + fmt.Sprintf("%d", fromBlock) + "&address=" + address + "&topic0=" + topic0 + "&page=" + fmt.Sprintf("%d", page) + "&offset=" + fmt.Sprintf("%d", offset) + "&apikey=" + EtherscanAPIKey
 	body, err := HttpGet(ctx, endpoint)
 	if err != nil {
 		return nil, err
