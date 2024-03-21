@@ -48,13 +48,14 @@ func TestDmpTransfer(t *testing.T) {
 
 func TestPolkadotToEthereum(t *testing.T) {
 	client := initClient("wss://rococo-asset-hub-rpc.polkadot.io")
+	client.SetKeyRing(AliceSeed2)
 	defer client.Close()
 	destH160 := strings.ToLower("0x6EB228b7ab726b8B44892e8e273ACF3dcC9C0492")
 	t.Run("Test_XCM_To_Ethereum", func(t *testing.T) {
 		txHash, err := client.SendTokenToEthereum(
 			destH160,
 			"0xfff9976782d46cc05630d1f6ebab18b2324d6b14",
-			decimal.New(1, 0),
+			decimal.New(5000000000, 0),
 			11155111)
 		assert.NoError(t, err)
 		assert.Len(t, txHash, 66)
