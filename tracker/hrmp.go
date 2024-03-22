@@ -34,6 +34,14 @@ func (h *Hrmp) Track(ctx context.Context) (*Event, error) {
 		return nil, err
 	}
 
+	// get spec runtime version
+	raw, err := rpc.GetMetadataByHash(nil, blockHash)
+	if err != nil {
+		return nil, err
+	}
+
+	metadataInstant = metadata.RegNewMetadataType(0, raw)
+
 	metadataStruct := types.MetadataStruct(*metadataInstant)
 	events, err := getEvents(ctx, client, blockHash, &metadataStruct)
 	if err != nil {
@@ -94,7 +102,7 @@ func (h *Hrmp) Track(ctx context.Context) (*Event, error) {
 		return nil, err
 	}
 
-	raw, err := rpc.GetMetadataByHash(nil, nextBlockHash)
+	raw, err = rpc.GetMetadataByHash(nil, nextBlockHash)
 	if err != nil {
 		return nil, err
 	}
