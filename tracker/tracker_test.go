@@ -30,15 +30,32 @@ func Test_TrackTx(t *testing.T) {
 
 func TestTrackBridgeMessage(t *testing.T) {
 	ctx := context.Background()
-	var err error
-	_, err = TrackBridgeMessage(ctx, &TrackBridgeMessageOptions{Tx: "0x799f01445e2be3103a1a751e33b395c4b894529ce3b320d2fd94c22d4e3d6e01"})
-	assert.NoError(t, err)
 
-	_, err = TrackBridgeMessage(ctx, &TrackBridgeMessageOptions{
+	var err error
+	// ethereum => polkadot
+	// https://sepolia.etherscan.io/tx/0x799f01445e2be3103a1a751e33b395c4b894529ce3b320d2fd94c22d4e3d6e01
+	event, err := TrackBridgeMessage(ctx, &TrackBridgeMessageOptions{Tx: "0x799f01445e2be3103a1a751e33b395c4b894529ce3b320d2fd94c22d4e3d6e01"})
+	assert.NoError(t, err)
+	assert.Equal(t, event.BlockNum, 2542078)
+	assert.Equal(t, event.ExtrinsicIdx, 2)
+
+	// polkadot => ethereum
+	// https://assethub-rococo.subscan.io/extrinsic/3879712-2
+	event, err = TrackBridgeMessage(ctx, &TrackBridgeMessageOptions{
 		ExtrinsicIndex:    "3879712-2",
 		BridgeHubEndpoint: "wss://rococo-bridge-hub-rpc.polkadot.io",
 		OriginEndpoint:    "wss://rococo-rockmine-rpc.polkadot.io",
 		RelayEndpoint:     "wss://rococo-rpc.polkadot.io",
 	})
 	assert.NoError(t, err)
+	assert.Equal(t, event.TxHash, "0x1435866e5c320adac9fed7827934ce6c34f28bf6cc2b5fae1ab3f5512fd0db76")
+
+	_, err = TrackBridgeMessage(ctx, &TrackBridgeMessageOptions{})
+	// will raise extrinsicIndexEmptyError error
+	assert.ErrorIs(t, err, extrinsicIndexEmptyError)
+
+	// will raise not found message id error
+	_, err = TrackBridgeMessage(ctx, &TrackBridgeMessageOptions{Tx: "0x2eb3249c5d64a617cc31a0c01e29f98a03400d066699d525a1fc17a0d0210660"})
+	assert.ErrorIs(t, err, notFindBridgeMessageIdError)
+
 }

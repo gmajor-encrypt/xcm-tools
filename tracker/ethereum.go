@@ -7,20 +7,34 @@ import (
 	"github.com/gmajor-encrypt/xcm-tools/tx"
 	"github.com/gmajor-encrypt/xcm-tools/util"
 	"log"
+	"strings"
 )
 
 type TrackBridgeMessageOptions struct {
-	Tx                string
-	ChainId           uint
-	ExtrinsicIndex    string
-	BridgeHubEndpoint string // bridge hub websocket endpoint
-	OriginEndpoint    string
-	RelayEndpoint     string
+	// ethereum => polkadot message transaction hash, like 0x270b9592600015788b279df9eab62670349d006cf3ffaf3185f84163b37b9154
+	Tx string
+	// ChainId is the chain id of the ethereum network
+	ChainId uint
+
+	// polkadot => ethereum message extrinsic index
+	ExtrinsicIndex string
+	// bridge hub websocket endpoint
+	BridgeHubEndpoint string
+	// origin chain websocket endpoint
+	OriginEndpoint string
+	// relay chain websocket endpoint
+	RelayEndpoint string
 }
 
 var (
 	bridgeHubName  = "bridgehub-rococo"                           // Subscan api endpoint name, for example: bridgehub-rococo,bridgehub-polkadot
 	bridgeContract = "0x5B4909cE6Ca82d2CE23BD46738953c7959E710Cd" // bridge contract address
+
+	extrinsicIndexEmptyError    = fmt.Errorf("extrinsicIndex is empty")
+	bridgeHubEndpointEmptyError = fmt.Errorf("bridgeHubEndpoint is empty")
+	originEndpointEmptyError    = fmt.Errorf("originEndpoint is empty")
+	relayEndpointEmptyError     = fmt.Errorf("relayEndpoint is empty")
+	notFindBridgeMessageIdError = fmt.Errorf("not found message id")
 )
 
 // TrackBridgeMessage ethereum <=> polkadot
@@ -28,7 +42,7 @@ func TrackBridgeMessage(ctx context.Context, opt *TrackBridgeMessageOptions) (*E
 	// ethereum -> polkadot
 	// if tx is not empty, will track ethereum => polkadot message
 	if opt.Tx != "" {
-
+		// Get transaction receipt
 		receipt, err := util.EthGetTransactionReceipt(ctx, opt.Tx)
 		if err != nil {
 			return nil, err
@@ -47,13 +61,15 @@ func TrackBridgeMessage(ctx context.Context, opt *TrackBridgeMessageOptions) (*E
 			if len(l.Topics) == 0 {
 				continue
 			}
+			// OutboundMessageAccepted (index_topic_1 bytes32 channelID, uint64 nonce, index_topic_2 bytes32 messageID, bytes payload)
+			// messageId is unique id
 			if l.Topics[0] == OutboundMessageAcceptedTopic {
 				messageId = l.Topics[2]
 				break
 			}
 		}
 		if messageId == "" {
-			return nil, errors.New("not found message id")
+			return nil, notFindBridgeMessageIdError
 		}
 
 		log.Println("Get ethereum message Id", messageId, "timestamp", timestamp, "blockNum", blockNum)
@@ -89,7 +105,13 @@ func TrackBridgeMessage(ctx context.Context, opt *TrackBridgeMessageOptions) (*E
 			for _, e := range events {
 				if e.Params[2].Value.(string) == messageId {
 					log.Printf("Find bridge message has process in extrinsic index %s,event index %s \n", e.ExtrinsicIndex, e.EventIndex)
-					return nil, nil
+					extrinsicIndexArr := strings.Split(e.ExtrinsicIndex, "-")
+					event := Event{
+						ExtrinsicIdx: util.ToInt(extrinsicIndexArr[1]),
+						BlockTime:    int64(e.BlockTimestamp),
+						BlockNum:     util.ToInt(extrinsicIndexArr[0]),
+					}
+					return &event, nil
 				}
 				startCrawlNum = int(findOutBlockByExtrinsicIndex(e.ExtrinsicIndex).BlockNum)
 			}
@@ -99,18 +121,20 @@ func TrackBridgeMessage(ctx context.Context, opt *TrackBridgeMessageOptions) (*E
 	// polkadot -> ethereum
 
 	if opt.ExtrinsicIndex == "" {
-		return nil, errors.New("extrinsicIndex is empty")
+		return nil, extrinsicIndexEmptyError
 	}
 	if opt.BridgeHubEndpoint == "" {
-		return nil, errors.New("bridgeHubEndpoint is empty")
+		return nil, bridgeHubEndpointEmptyError
 	}
 	if opt.OriginEndpoint == "" {
-		return nil, errors.New("originEndpoint is empty")
+		return nil, originEndpointEmptyError
 	}
 	if opt.RelayEndpoint == "" {
-		return nil, errors.New("relayEndpoint is empty")
+		return nil, relayEndpointEmptyError
 	}
+
 	h := Hrmp{extrinsicIndex: opt.ExtrinsicIndex, originEndpoint: opt.OriginEndpoint, destEndpoint: opt.BridgeHubEndpoint, relayChainEndpoint: opt.RelayEndpoint}
+
 	filterCall := func(events []Event, i *tx.VersionedXcm, _, blockHash string) (*Event, string, error) {
 		// MessageQueued(H256)
 		messageId := i.PickoutExportMessageTopic()
@@ -131,6 +155,7 @@ func TrackBridgeMessage(ctx context.Context, opt *TrackBridgeMessageOptions) (*E
 	}
 	h.filterCallBack = filterCall
 
+	// track assetHub => bridgeHub HRMP message
 	event, err := h.Track(ctx)
 
 	if err != nil {
@@ -150,8 +175,12 @@ func TrackBridgeMessage(ctx context.Context, opt *TrackBridgeMessageOptions) (*E
 		if len(l.Topics) == 0 {
 			continue
 		}
+		// InboundMessageDispatchedTopic InboundMessageDispatched (index_topic_1 bytes32 channelID, uint64 nonce, index_topic_2 bytes32 messageID, bool success)
+		// check message id is equal
 		if l.Topics[2] == h.messageId {
 			log.Println("Find bridge message have process in", util.HexToUint64(l.BlockNumber), l.TransactionHash)
+			event.TxHash = l.TransactionHash
+			return event, nil
 		}
 	}
 	return nil, nil

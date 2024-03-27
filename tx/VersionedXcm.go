@@ -6,7 +6,9 @@ type VersionedXcm struct {
 	V0 *V0 `json:"V0,omitempty"`
 	V1 *V1 `json:"V1,omitempty"`
 	V2 *V2 `json:"V2,omitempty"`
+	// Xcm v3 https://github.com/paritytech/polkadot-sdk/tree/66051adb619d2119771920218e2de75fa037d7e8/polkadot/xcm/src/v3
 	V3 *V3 `json:"V3,omitempty"`
+	// Xcm v4 https://github.com/paritytech/polkadot-sdk/tree/66051adb619d2119771920218e2de75fa037d7e8/polkadot/xcm/src/v4
 	V4 *V4 `json:"V4,omitempty"`
 }
 

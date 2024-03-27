@@ -12,12 +12,17 @@ import (
 )
 
 type Hrmp struct {
-	extrinsicIndex     string
-	originEndpoint     string
-	destEndpoint       string
+	// sent HRMP message extrinsic index
+	extrinsicIndex string
+	// origin parachain endpoint
+	originEndpoint string
+	// dest parachain endpoint
+	destEndpoint string
+	// relay chain endpoint
 	relayChainEndpoint string
 	filterCallBack     func(events []Event, i *tx.VersionedXcm, messageHash, blockHash string) (*Event, string, error)
-	messageId          string
+	// hrmp message id
+	messageId string
 }
 
 func (h *Hrmp) Track(ctx context.Context) (*Event, error) {
@@ -65,6 +70,7 @@ func (h *Hrmp) Track(ctx context.Context) (*Event, error) {
 		destParaId uint
 	)
 	parseClient := parse.New(metadataInstant)
+
 	// pick the message by messageHash
 	for _, message := range hrmpOutboundMessages {
 		for _, raw := range parseClient.DecodeFixedMessage(util.TrimHex(message.Data)[2:]) {
@@ -185,11 +191,13 @@ func hrmpFilter(events []Event, i *tx.VersionedXcm, messageHash, _ string) (*Eve
 	messageId := i.PickoutTopicId()
 	event := findEventByEventId(events, 1, []string{"Success", "Failed"})
 	if event != nil {
+		// find messageHash
 		if len(event.Params) == 2 {
 			if event.Params[0].Value.(string) == messageHash {
 				log.Printf("Find HRMP messageHash %s, result %s", messageHash, event.EventId)
 				return event, messageId, nil
 			}
+			// find messageId
 		} else if len(event.Params) == 3 {
 			if event.Params[1].Value.(string) == messageId {
 				log.Printf("Find HRMP messageHash %s,messageId %s result %s", messageHash, messageId, event.EventId)

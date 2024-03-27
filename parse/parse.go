@@ -15,9 +15,12 @@ import (
 )
 
 type Instant struct {
+	// xcm version scale type name
 	xcmVersionTypeName string
-	xcmVersion         int
-	m                  *metadata.Instant
+	// xcm version number, like 2,3,4,5
+	xcmVersion int
+	// metadata instant
+	m *metadata.Instant
 }
 
 func New(m *metadata.Instant) *Instant {
@@ -35,22 +38,29 @@ func (c *Instant) ParseXcmMessageInstruction(messageRaw string) (*tx.VersionedXc
 	if err != nil {
 		return nil, err
 	}
+
+	// scale decode message
 	raw, err := storage.Decode(messageRaw, typeName, nil)
 	if err != nil {
 		return nil, err
 	}
+
 	var instruction tx.VersionedXcm
 	raw.ToAny(&instruction)
 	return &instruction, nil
 }
 
 func (c *Instant) getMessageVersionType(messageRaw, defaultType string) (string, error) {
+	// default type name is VersionedXcm
 	typeName := "VersionedXcm"
 	bytes := util.HexToBytes(messageRaw)
 	if len(bytes) == 0 {
 		return "", MessageRawIsEmptyErr
 	}
+
 	XcmVersion := int(utiles.U256(util.BytesToHex(bytes[0:1])).Uint64())
+	// because xcm V0,V1 has been removed, so we need to check if the version is greater than 1
+	// default type name is metadata scale type name
 	if XcmVersion > 1 {
 		typeName = defaultType
 	}
@@ -59,6 +69,8 @@ func (c *Instant) getMessageVersionType(messageRaw, defaultType string) (string,
 
 func (c *Instant) getXcmLatestVersion() {
 	moduleName := "XcmPallet"
+
+	// parachain xcm module name is PolkadotXcm
 	if tx.GetModule(moduleName, c.m) == nil {
 		moduleName = "PolkadotXcm"
 	}
@@ -66,6 +78,7 @@ func (c *Instant) getXcmLatestVersion() {
 	call := tx.GetCallByName(moduleName, "send", c.m)
 
 	if call != nil {
+		// get xcm version scale type name
 		c.xcmVersionTypeName = call.Args[1].Type
 
 		r := types.RuntimeType{}
@@ -101,11 +114,14 @@ func (c *Instant) DecodeFixedMessage(messageRaw string) []string {
 		scale := types.ScaleDecoder{}
 		scale.Init(scaleBytes.ScaleBytes{Data: raw}, nil)
 		scale.ProcessAndUpdateData(decodeType)
+		// if remaining length is 0, means all messages are decoded
 		if scale.Data.GetRemainingLength() == 0 {
 			return nil
 		}
 		return scale.Data.GetNextBytes(scale.Data.GetRemainingLength())
 	}
+	// hrmp message is a fixed count messages, but raw message not have array length
+	// so we need to try decode message until all messages are decoded
 	for {
 		if tryCount > 200 {
 			break

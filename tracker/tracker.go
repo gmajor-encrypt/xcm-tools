@@ -73,10 +73,12 @@ func findOutBlockByExtrinsicIndex(extrinsicIndex string) *ExtrinsicIndex {
 	return nil
 }
 
+// hash return blake2_256 hash
 func hash(hex string) string {
 	return utiles.AddHex(utiles.BytesToHex(hasher.HashByCryptoName(utiles.HexToBytes(hex), "Blake2_256")))
 }
 
+// trackXcmMessage track xcm message
 func TrackXcmMessage(extrinsicIndex string, protocol tx.Protocol, originEndpoint, destEndpoint, relayEndpoint string) (*Event, error) {
 	log.Println("Start track xcm message with ExtrinsicIndex:", extrinsicIndex,
 		"Protocol:", protocol,

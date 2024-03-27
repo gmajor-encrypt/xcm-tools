@@ -20,6 +20,7 @@ type Block struct {
 	Extrinsics []string `json:"extrinsics"`
 }
 
+// get extrinsics raw from block
 func getExtrinsics(_ context.Context, p *websocket.PoolConn, blockHash string) ([]string, error) {
 	v := &model.JsonRpcResult{}
 	if err := websocket.SendWsRequest(p.Conn, v, rpc.ChainGetBlock(rand.Intn(10), blockHash)); err != nil {
@@ -33,6 +34,7 @@ func getExtrinsics(_ context.Context, p *websocket.PoolConn, blockHash string) (
 	return block.Block.Extrinsics, nil
 }
 
+// get extrinsic by index
 func getExtrinsicByIndex(_ context.Context, extrinsics []string, index int, metadata *types.MetadataStruct) (*scalecodec.GenericExtrinsic, error) {
 	if len(extrinsics) <= index {
 		return nil, errors.New("index out of range")

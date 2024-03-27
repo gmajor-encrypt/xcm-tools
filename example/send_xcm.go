@@ -49,5 +49,5 @@ func main() {
 		log.Panic(err)
 	}
 
-	log.Printf("This Extrinsic has success send with hash %s", utiles.AddHex(utiles.BytesToHex(hasher.HashByCryptoName(utiles.HexToBytes(signed), "Blake2_256"))))
+	log.Printf("This Extrinsic has successfully sent with hash %s", utiles.AddHex(utiles.BytesToHex(hasher.HashByCryptoName(utiles.HexToBytes(signed), "Blake2_256"))))
 }

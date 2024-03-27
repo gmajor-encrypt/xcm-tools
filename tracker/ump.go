@@ -11,9 +11,12 @@ import (
 )
 
 type Ump struct {
+	// Sent UMP message extrinsic index
 	ExtrinsicIndex string
+	// origin chain websocket endpoint
 	OriginEndpoint string
-	DestEndpoint   string
+	// destination chain websocket endpoint
+	DestEndpoint string
 }
 
 func (u *Ump) Track(ctx context.Context) (*Event, error) {
@@ -128,6 +131,8 @@ func (u *Ump) Track(ctx context.Context) (*Event, error) {
 	return nil, errors.New("not found xcm exec result")
 }
 
+// getUmpMessageByMessageHash get message by query parachainSystem.UpwardMessages
+// filter by messageHash
 func getUmpMessageByMessageHash(messageHash, blockHash string) (string, error) {
 	messages, err := UpwardMessages(blockHash)
 	if err != nil {

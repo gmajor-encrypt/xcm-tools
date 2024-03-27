@@ -11,9 +11,12 @@ import (
 )
 
 type Dmp struct {
+	// sent message extrinsicIndex
 	extrinsicIndex string
+	// origin chain sent message websocket endpoint
 	originEndpoint string
-	destEndpoint   string
+	// dest chain received message websocket endpoint
+	destEndpoint string
 }
 
 func (d *Dmp) Track(ctx context.Context) (*Event, error) {

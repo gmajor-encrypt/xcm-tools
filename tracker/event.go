@@ -17,11 +17,16 @@ import (
 )
 
 type Event struct {
+	// extrinsic index in block
 	ExtrinsicIdx int          `json:"extrinsic_idx" `
+	BlockNum     int          `json:"block_num" `
 	ModuleId     string       `json:"module_id"  `
 	EventId      string       `json:"event_id" `
 	Params       []EventParam `json:"params"`
-	BlockTime    int64        `json:"block_time"`
+	// block timestamp
+	BlockTime int64 `json:"block_time"`
+
+	TxHash string `json:"tx_hash"`
 }
 
 type EventParam struct {
@@ -31,6 +36,7 @@ type EventParam struct {
 	Name     string      `json:"name,omitempty"`
 }
 
+// get events raw from chain
 func getEventsFromChain(_ context.Context, p *recws.RecConn, blockHash string) (string, error) {
 	key := storageKey.EncodeStorageKey("system", "events")
 	v := &model.JsonRpcResult{}
@@ -40,6 +46,7 @@ func getEventsFromChain(_ context.Context, p *recws.RecConn, blockHash string) (
 	return v.ToString()
 }
 
+// get events from chain, and decode it
 func getEvents(ctx context.Context, p *websocket.PoolConn, blockHash string, metadata *types.MetadataStruct) ([]Event, error) {
 	raw, err := getEventsFromChain(ctx, p.Conn, blockHash)
 	if err != nil {
@@ -57,6 +64,7 @@ func getEvents(ctx context.Context, p *websocket.PoolConn, blockHash string, met
 	return events, err
 }
 
+// find event by event id
 func findEventByEventId(events []Event, index uint, eventId []string) *Event {
 	for _, event := range events {
 		if util.StringInSlice(event.EventId, eventId) && event.ExtrinsicIdx == int(index) {

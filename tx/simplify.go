@@ -65,6 +65,10 @@ func SimplifyMultiAssets(amount decimal.Decimal) *MultiAssets {
 	}
 }
 
+// SimplifyEthereumAssets Simplify Ethereum assets to V3MultiAssets
+// chainId: Ethereum chain id
+// tokenContract: Ethereum token contract address
+// amount: Ethereum token amount
 func SimplifyEthereumAssets(chainId uint64, tokenContract string, amount decimal.Decimal) V3MultiAssets {
 	return V3MultiAssets{
 		Id: AssetsIdV3{

@@ -79,7 +79,7 @@ GLOBAL OPTIONS:
 
 #### Args
 
-| Name               | Describe                                                                          | Suitable              |
+| Name               | Description                                                                       | Suitable              |
 |--------------------|-----------------------------------------------------------------------------------|-----------------------|
 | dest               | Dest address                                                                      | SendXCM               |
 | amount             | Send xcm transfer amount                                                          | SendXCM               |
@@ -286,7 +286,7 @@ func main() {
 		log.Panic(err)
 	}
 
-	log.Printf("This Extrinsic has success send with hash %s", utiles.AddHex(utiles.BytesToHex(hasher.HashByCryptoName(utiles.HexToBytes(signed), "Blake2_256"))))
+	log.Printf("This Extrinsic has successfully sent with hash %s", utiles.AddHex(utiles.BytesToHex(hasher.HashByCryptoName(utiles.HexToBytes(signed), "Blake2_256"))))
 }
 
 ```
@@ -371,7 +371,8 @@ func SendEthErc20Token() {
 ### Test
 
 ```bash
-go test -v ./...
+# Ensure you have in code root directory
+go test -v ./... 
 ```
 
 docker
