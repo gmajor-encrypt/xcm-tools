@@ -14,6 +14,7 @@ result of the execution after sending xcm.
 - [x] Cli Support
 - [x] XCM V2,V3,V4 Support
 - [x] Ethereum <=> Polkadot SnowBridge support
+- [ ] Polkadot <=> Kusama bridge 
 
 ## Get Start
 
