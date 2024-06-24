@@ -7,9 +7,15 @@ import (
 )
 
 const (
-	EtherscanAPIBaseURL = "https://api-sepolia.etherscan.io/api"
-	EtherscanAPIKey     = "5D91FZ48V3XPNV58ZSNAYBBWS14K3GGSZC"
+	EtherscanAPIKey = "5D91FZ48V3XPNV58ZSNAYBBWS14K3GGSZC"
 )
+
+func etherscanAPIBaseURL(isMainnet bool) string {
+	if isMainnet {
+		return "https://api.etherscan.io/api"
+	}
+	return "https://api-sepolia.etherscan.io/api"
+}
 
 type EtherscanProxyRes[T any] struct {
 	Jsonrpc string `json:"jsonrpc"`
@@ -42,8 +48,8 @@ type EtherscanTransaction struct {
 
 // EthGetTransactionByHash returns the transaction details by hash
 // eth_getTransactionByHash
-func EthGetTransactionByHash(ctx context.Context, hash string) (*EtherscanTransaction, error) {
-	var endpoint = EtherscanAPIBaseURL + "?module=proxy&action=eth_getTransactionByHash&txhash=" + hash + "&apikey=" + EtherscanAPIKey
+func EthGetTransactionByHash(ctx context.Context, isMainnet bool, hash string) (*EtherscanTransaction, error) {
+	var endpoint = etherscanAPIBaseURL(isMainnet) + "?module=proxy&action=eth_getTransactionByHash&txhash=" + hash + "&apikey=" + EtherscanAPIKey
 	body, err := HttpGet(ctx, endpoint)
 	if err != nil {
 		return nil, err
@@ -86,8 +92,8 @@ type EthReceiptLog struct {
 
 // EthGetTransactionReceipt returns the transaction receipt by hash
 // eth_getTransactionReceipt
-func EthGetTransactionReceipt(ctx context.Context, hash string) (*EtherscanTransactionReceipt, error) {
-	var endpoint = EtherscanAPIBaseURL + "?module=proxy&action=eth_getTransactionReceipt&txhash=" + hash + "&apikey=" + EtherscanAPIKey
+func EthGetTransactionReceipt(ctx context.Context, isMainnet bool, hash string) (*EtherscanTransactionReceipt, error) {
+	var endpoint = etherscanAPIBaseURL(isMainnet) + "?module=proxy&action=eth_getTransactionReceipt&txhash=" + hash + "&apikey=" + EtherscanAPIKey
 	body, err := HttpGet(ctx, endpoint)
 	if err != nil {
 		return nil, err
@@ -121,9 +127,9 @@ type EtherscanBlock struct {
 	Uncles           []interface{} `json:"uncles"`
 }
 
-func EthGetBlockByNum(ctx context.Context, blockNum uint64) (*EtherscanBlock, error) {
+func EthGetBlockByNum(ctx context.Context, isMainnet bool, blockNum uint64) (*EtherscanBlock, error) {
 	// https://api.etherscan.io/api?module=proxy&action=eth_getBlockByNumber&tag=0x10d4f&boolean=false&apikey=YourApiKeyToken
-	var endpoint = EtherscanAPIBaseURL + "?module=proxy&action=eth_getBlockByNumber&tag=0x" + fmt.Sprintf("%x", blockNum) + "&boolean=false&apikey=" + EtherscanAPIKey
+	var endpoint = etherscanAPIBaseURL(isMainnet) + "?module=proxy&action=eth_getBlockByNumber&tag=0x" + fmt.Sprintf("%x", blockNum) + "&boolean=false&apikey=" + EtherscanAPIKey
 	body, err := HttpGet(ctx, endpoint)
 	if err != nil {
 		return nil, err
@@ -141,9 +147,9 @@ type EtherscanRes[T any] struct {
 	Result  T      `json:"result"`
 }
 
-func EtherscanGetBlockByTime(ctx context.Context, timestamp int64) (uint, error) {
+func EtherscanGetBlockByTime(ctx context.Context, isMainnet bool, timestamp int64) (uint, error) {
 	// https://api-sepolia.etherscan.io/api?module=block&action=getblocknobytime&timestamp=1708921620&closest=after&apikey=5D91FZ48V3XPNV58ZSNAYBBWS14K3GGSZC
-	var endpoint = EtherscanAPIBaseURL + "?module=block&action=getblocknobytime&timestamp=" + fmt.Sprintf("%d", timestamp) + "&closest=after&apikey=" + EtherscanAPIKey
+	var endpoint = etherscanAPIBaseURL(isMainnet) + "?module=block&action=getblocknobytime&timestamp=" + fmt.Sprintf("%d", timestamp) + "&closest=after&apikey=" + EtherscanAPIKey
 	body, err := HttpGet(ctx, endpoint)
 	if err != nil {
 		return 0, err
@@ -170,9 +176,9 @@ type EtherscanLog struct {
 	TransactionIndex string   `json:"transactionIndex"`
 }
 
-func EtherscanGetLogs(ctx context.Context, fromBlock uint64, address, topic0 string, page uint64, offset uint64) ([]EtherscanLog, error) {
+func EtherscanGetLogs(ctx context.Context, isMainnet bool, fromBlock uint64, address, topic0 string, page uint64, offset uint64) ([]EtherscanLog, error) {
 	// https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=12878196&topic0=0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef&page=1&offset=1&apikey=YourApiKeyToken
-	var endpoint = EtherscanAPIBaseURL + "?module=logs&action=getLogs&fromBlock=" + fmt.Sprintf("%d", fromBlock) + "&address=" + address + "&topic0=" + topic0 + "&page=" + fmt.Sprintf("%d", page) + "&offset=" + fmt.Sprintf("%d", offset) + "&apikey=" + EtherscanAPIKey
+	var endpoint = etherscanAPIBaseURL(isMainnet) + "?module=logs&action=getLogs&fromBlock=" + fmt.Sprintf("%d", fromBlock) + "&address=" + address + "&topic0=" + topic0 + "&page=" + fmt.Sprintf("%d", page) + "&offset=" + fmt.Sprintf("%d", offset) + "&apikey=" + EtherscanAPIKey
 	body, err := HttpGet(ctx, endpoint)
 	if err != nil {
 		return nil, err

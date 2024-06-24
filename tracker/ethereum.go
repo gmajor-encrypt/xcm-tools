@@ -24,11 +24,36 @@ type TrackBridgeMessageOptions struct {
 	OriginEndpoint string
 	// relay chain websocket endpoint
 	RelayEndpoint string
+
+	// bridge hub name
+	BridgeHubName string
 }
 
 var (
-	bridgeHubName  = "bridgehub-rococo"                           // Subscan api endpoint name, for example: bridgehub-rococo,bridgehub-polkadot
-	bridgeContract = "0x5B4909cE6Ca82d2CE23BD46738953c7959E710Cd" // bridge contract address
+	bridgeHubRococo   = "bridgehub-rococo"
+	bridgeHubWestend  = "bridgehub-westend"
+	bridgeHubPolkadot = "bridgehub-polkadot"
+	bridgeHubKusama   = "bridgehub-kusama"
+)
+
+// Subscan api endpoint name, for example: bridgehub-rococo,bridgehub-polkadot =
+
+func (t *TrackBridgeMessageOptions) bridgeHubName() string {
+	const defaultBridgeHubName = "bridgehub-rococo"
+	if t.BridgeHubName != "" {
+		if !util.InSlice(t.BridgeHubName, []string{bridgeHubRococo, bridgeHubWestend, bridgeHubPolkadot, bridgeHubKusama}) {
+			panic(fmt.Sprintf("bridgeHubName %s is not supported", t.BridgeHubName))
+		}
+		return t.BridgeHubName
+	}
+	return defaultBridgeHubName
+}
+
+var (
+	bridgeContract = map[string]string{
+		bridgeHubPolkadot: "0x27ca963C279c93801941e1eB8799c23f407d68e7", // polkadot bridge contract address
+		bridgeHubRococo:   "0x5B4909cE6Ca82d2CE23BD46738953c7959E710Cd", // rococo bridge contract address
+	}
 
 	extrinsicIndexEmptyError    = fmt.Errorf("extrinsicIndex is empty")
 	bridgeHubEndpointEmptyError = fmt.Errorf("bridgeHubEndpoint is empty")
@@ -41,16 +66,18 @@ var (
 func TrackBridgeMessage(ctx context.Context, opt *TrackBridgeMessageOptions) (*Event, error) {
 	// ethereum -> polkadot
 	// if tx is not empty, will track ethereum => polkadot message
+	isPolkadot := opt.bridgeHubName() == bridgeHubPolkadot
+
 	if opt.Tx != "" {
 		// Get transaction receipt
-		receipt, err := util.EthGetTransactionReceipt(ctx, opt.Tx)
+		receipt, err := util.EthGetTransactionReceipt(ctx, isPolkadot, opt.Tx)
 		if err != nil {
 			return nil, err
 		}
 		blockNum := util.HexToUint64(receipt.BlockNumber)
 
 		// Get block timestamp
-		block, err := util.EthGetBlockByNum(ctx, blockNum)
+		block, err := util.EthGetBlockByNum(ctx, isPolkadot, blockNum)
 		if err != nil {
 			return nil, err
 		}
@@ -74,7 +101,7 @@ func TrackBridgeMessage(ctx context.Context, opt *TrackBridgeMessageOptions) (*E
 
 		log.Println("Get ethereum message Id", messageId, "timestamp", timestamp, "blockNum", blockNum)
 
-		polkadotBlock, err := util.SubscanGetBlockByTime(ctx, bridgeHubName, uint(timestamp))
+		polkadotBlock, err := util.SubscanGetBlockByTime(ctx, opt.bridgeHubName(), uint(timestamp))
 		if err != nil {
 			log.Printf("SubscanGetBlockByTime get err %v\n", err)
 			return nil, err
@@ -94,7 +121,7 @@ func TrackBridgeMessage(ctx context.Context, opt *TrackBridgeMessageOptions) (*E
 		const maxEndBlockNum = 99999999
 		for {
 			eventReqParams.BlockRange = fmt.Sprintf("%d-%d", startCrawlNum, maxEndBlockNum)
-			events, err := util.SubscanGetEvents(ctx, bridgeHubName, &eventReqParams)
+			events, err := util.SubscanGetEvents(ctx, opt.bridgeHubName(), &eventReqParams)
 			if len(events) == 0 {
 				return nil, errors.New("not found message")
 			}
@@ -161,13 +188,13 @@ func TrackBridgeMessage(ctx context.Context, opt *TrackBridgeMessageOptions) (*E
 	if err != nil {
 		return nil, err
 	}
-	etherStartBlockNum, err := util.EtherscanGetBlockByTime(ctx, event.BlockTime)
+	etherStartBlockNum, err := util.EtherscanGetBlockByTime(ctx, isPolkadot, event.BlockTime)
 	if err != nil {
 		return nil, err
 	}
 	log.Println("Get etherStartBlockNum", etherStartBlockNum)
 
-	logs, err := util.EtherscanGetLogs(ctx, uint64(etherStartBlockNum), bridgeContract, InboundMessageDispatchedTopic, 1, 1000)
+	logs, err := util.EtherscanGetLogs(ctx, isPolkadot, uint64(etherStartBlockNum), bridgeContract[opt.BridgeHubName], InboundMessageDispatchedTopic, 1, 1000)
 	if err != nil {
 		return nil, err
 	}

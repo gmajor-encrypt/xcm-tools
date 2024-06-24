@@ -37,7 +37,7 @@ func Test_EthGetTransactionByHash(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		got, err := EthGetTransactionByHash(tt.args.ctx, tt.args.hash)
+		got, err := EthGetTransactionByHash(tt.args.ctx, false, tt.args.hash)
 		if !errors.Is(err, tt.err) {
 			t.Errorf("EthGetTransactionByHash() error = %v, wantErr %v", err, tt.err)
 			return
@@ -80,7 +80,7 @@ func Test_EthGetTransactionReceipt(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		got, err := EthGetTransactionReceipt(tt.args.ctx, tt.args.hash)
+		got, err := EthGetTransactionReceipt(tt.args.ctx, false, tt.args.hash)
 		if !errors.Is(err, tt.err) {
 			t.Errorf("EthGetTransactionByHash() error = %v, wantErr %v", err, tt.err)
 			return
@@ -125,7 +125,7 @@ func Test_EthGetBlockByNum(t *testing.T) {
 	}
 	for _, tt := range tests {
 		time.Sleep(1 * time.Second)
-		got, err := EthGetBlockByNum(tt.args.ctx, tt.args.blockNum)
+		got, err := EthGetBlockByNum(tt.args.ctx, false, tt.args.blockNum)
 		if !errors.Is(err, tt.err) {
 			t.Errorf("Test_EthGetBlockByNum() error = %v, wantErr %v", err, tt.err)
 			return
@@ -166,7 +166,7 @@ func TestEtherscanGetLogs(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		got, err := EtherscanGetLogs(tt.args.ctx, tt.args.fromBlock, tt.args.address, tt.args.topic0, tt.args.page, tt.args.offset)
+		got, err := EtherscanGetLogs(tt.args.ctx, false, tt.args.fromBlock, tt.args.address, tt.args.topic0, tt.args.page, tt.args.offset)
 		if !errors.Is(err, tt.err) {
 			t.Errorf("EtherscanGetLogs() error = %v, wantErr %v", err, tt.err)
 			return

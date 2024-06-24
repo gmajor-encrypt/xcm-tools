@@ -28,3 +28,12 @@ func ToUint(i string) uint {
 	}
 	return 0
 }
+
+func InSlice[T comparable](el T, list []T) bool {
+	for _, v := range list {
+		if el == v {
+			return true
+		}
+	}
+	return false
+}

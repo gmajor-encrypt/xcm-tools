@@ -8,7 +8,7 @@ import (
 )
 
 func Test_Client(t *testing.T) {
-	client := NewClient("wss://polkadot-rpc.dwellir.com")
+	client := NewClient("wss://rpc.polkadot.io")
 
 	assert.NotNil(t, GetModule("Balances", client.m))
 	assert.Nil(t, GetModule("xtokens", client.m))
