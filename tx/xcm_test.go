@@ -8,14 +8,14 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// 	 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY
-const AliceSeed = "0xe5be9a5092b81bca64be81d212e7f2f9eba183bb7a90954f7b76361f6edb5c0a"
+// 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY
+// const AliceSeed = "0xe5be9a5092b81bca64be81d212e7f2f9eba183bb7a90954f7b76361f6edb5c0a"
 const AliceSeed2 = "0xc0417c253312107d808921fb1dd3b740b64e99794dca74bcc550179f7c42a255"
 const DestAccountId = "0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
 
 func initClient(endpoint string) *Client {
 	client := NewClient(endpoint)
-	client.Conn.SetKeyRing(keyring.New(keyring.Sr25519Type, AliceSeed))
+	client.Conn.SetKeyRing(keyring.New(keyring.Sr25519Type, AliceSeed2))
 	return client
 }
 

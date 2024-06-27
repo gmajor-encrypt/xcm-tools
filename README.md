@@ -20,7 +20,7 @@ result of the execution after sending xcm.
 
 ### Requirement
 
-1. Go 1.18+
+1. Go 1.20+
 2. docker(optional)
 
 ### Build
