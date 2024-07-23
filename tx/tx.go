@@ -161,3 +161,28 @@ func (c *Client) SendTokenToEthereum(h160, tokenContract string, amount decimal.
 	tx, err := c.Conn.SendAuthorSubmitExtrinsic(signed)
 	return tx, err
 }
+
+// SendDotKsmChainToken send XCM HRMP message
+// Transfer assets between polkadot and kusama (or other substrate chain)
+func (c *Client) SendDotKsmChainToken(dest string, paraId uint32, GlobalConsensusNetworkId *GlobalConsensusNetworkId, amount decimal.Decimal) (string, error) {
+	callName, args := c.Hrmp.TransferAssets(
+		&VersionedMultiLocation{V3: &V3MultiLocation{
+			Interior: V3MultiLocationJunctions{X2: map[string]XCMJunctionV3{
+				"col0": {GlobalConsensus: GlobalConsensusNetworkId},
+				"col1": {Parachain: &paraId},
+			}}, Parents: 2,
+		}},
+		&VersionedMultiLocation{V3: &V3MultiLocation{
+			Interior: V3MultiLocationJunctions{X1: &XCMJunctionV3{AccountId32: &XCMJunctionV3AccountId32{Id: dest}}}, Parents: 0,
+		}},
+		SimplifyV3MultiAssets(amount),
+		0,
+		SimplifyUnlimitedWeight(),
+	)
+	signed, err := c.Conn.SignTransaction(c.Hrmp.GetModuleName(), callName, args...)
+	if err != nil {
+		return "", err
+	}
+	tx, err := c.Conn.SendAuthorSubmitExtrinsic(signed)
+	return tx, err
+}

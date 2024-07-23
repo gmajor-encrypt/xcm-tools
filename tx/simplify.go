@@ -65,6 +65,25 @@ func SimplifyMultiAssets(amount decimal.Decimal) *MultiAssets {
 	}
 }
 
+// SimplifyV3MultiAssets Simplify sovereignty token to V3MultiAssets
+func SimplifyV3MultiAssets(amount decimal.Decimal) *MultiAssets {
+	return &MultiAssets{
+		V3: []V3MultiAssets{
+			{
+				Id: AssetsIdV3{
+					Concrete: &V3MultiLocation{
+						Interior: V3MultiLocationJunctions{Here: "NULL"},
+						Parents:  1,
+					},
+				},
+				Fun: AssetsFun{
+					Fungible: &amount,
+				},
+			},
+		},
+	}
+}
+
 // SimplifyEthereumAssets Simplify Ethereum assets to V3MultiAssets
 // chainId: Ethereum chain id
 // tokenContract: Ethereum token contract address

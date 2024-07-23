@@ -36,7 +36,7 @@ var (
 	bridgeHubKusama   = "bridgehub-kusama"
 )
 
-// Subscan api endpoint name, for example: bridgehub-rococo,bridgehub-polkadot =
+// Subscan api endpoint name, for example: bridgehub-rococo,bridgehub-polkadot, bridgehub-westend, bridgehub-kusama
 
 func (t *TrackBridgeMessageOptions) bridgeHubName() string {
 	const defaultBridgeHubName = "bridgehub-rococo"
