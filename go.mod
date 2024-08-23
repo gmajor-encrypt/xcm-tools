@@ -6,7 +6,7 @@ toolchain go1.21.0
 
 require (
 	github.com/itering/scale.go v1.9.4
-	github.com/itering/substrate-api-rpc v0.7.1
+	github.com/itering/substrate-api-rpc v0.7.2
 	github.com/shopspring/decimal v1.4.0
 	github.com/stretchr/testify v1.8.4
 	github.com/urfave/cli v1.22.14
