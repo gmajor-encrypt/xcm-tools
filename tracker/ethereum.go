@@ -62,8 +62,8 @@ var (
 	notFindBridgeMessageIdError = fmt.Errorf("not found message id")
 )
 
-// TrackBridgeMessage ethereum <=> polkadot
-func TrackBridgeMessage(ctx context.Context, opt *TrackBridgeMessageOptions) (*Event, error) {
+// TrackEthBridgeMessage ethereum <=> polkadot
+func TrackEthBridgeMessage(ctx context.Context, opt *TrackBridgeMessageOptions) (*Event, error) {
 	// ethereum -> polkadot
 	// if tx is not empty, will track ethereum => polkadot message
 	isPolkadot := opt.bridgeHubName() == bridgeHubPolkadot

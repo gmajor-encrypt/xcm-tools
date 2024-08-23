@@ -34,14 +34,14 @@ func TestTrackBridgeMessage(t *testing.T) {
 	var err error
 	// ethereum => polkadot
 	// https://sepolia.etherscan.io/tx/0x799f01445e2be3103a1a751e33b395c4b894529ce3b320d2fd94c22d4e3d6e01
-	event, err := TrackBridgeMessage(ctx, &TrackBridgeMessageOptions{Tx: "0x799f01445e2be3103a1a751e33b395c4b894529ce3b320d2fd94c22d4e3d6e01"})
+	event, err := TrackEthBridgeMessage(ctx, &TrackBridgeMessageOptions{Tx: "0x799f01445e2be3103a1a751e33b395c4b894529ce3b320d2fd94c22d4e3d6e01"})
 	assert.NoError(t, err)
 	assert.Equal(t, event.BlockNum, 2542078)
 	assert.Equal(t, event.ExtrinsicIdx, 2)
 
 	// polkadot => ethereum
 	// https://assethub-rococo.subscan.io/extrinsic/3879712-2
-	event, err = TrackBridgeMessage(ctx, &TrackBridgeMessageOptions{
+	event, err = TrackEthBridgeMessage(ctx, &TrackBridgeMessageOptions{
 		ExtrinsicIndex:    "3879712-2",
 		BridgeHubEndpoint: "wss://rococo-bridge-hub-rpc.polkadot.io",
 		OriginEndpoint:    "wss://rococo-rockmine-rpc.polkadot.io",
@@ -50,12 +50,28 @@ func TestTrackBridgeMessage(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, event.TxHash, "0x1435866e5c320adac9fed7827934ce6c34f28bf6cc2b5fae1ab3f5512fd0db76")
 
-	_, err = TrackBridgeMessage(ctx, &TrackBridgeMessageOptions{})
+	_, err = TrackEthBridgeMessage(ctx, &TrackBridgeMessageOptions{})
 	// will raise extrinsicIndexEmptyError error
 	assert.ErrorIs(t, err, extrinsicIndexEmptyError)
 
 	// will raise not found message id error
-	_, err = TrackBridgeMessage(ctx, &TrackBridgeMessageOptions{Tx: "0x2eb3249c5d64a617cc31a0c01e29f98a03400d066699d525a1fc17a0d0210660"})
+	_, err = TrackEthBridgeMessage(ctx, &TrackBridgeMessageOptions{Tx: "0x2eb3249c5d64a617cc31a0c01e29f98a03400d066699d525a1fc17a0d0210660"})
 	assert.ErrorIs(t, err, notFindBridgeMessageIdError)
 
+}
+
+// https://rococo.subscan.io/xcm_message/rococo-907f951e05c3516ba5dc3ee37838321a5b28fc34
+func TestTrackS2sBridgeMessage(t *testing.T) {
+	ctx := context.Background()
+	_, err := TrackS2sBridgeMessage(ctx, &S2STrackBridgeMessageOptions{
+		ExtrinsicIndex:      "5816546-2",
+		BridgeHubEndpoint:   "wss://rococo-bridge-hub-rpc.polkadot.io",
+		OriginEndpoint:      "wss://rococo-rockmine-rpc.polkadot.io",
+		OriginRelayEndpoint: "wss://rococo-rpc.polkadot.io",
+
+		DestinationEndpoint:          "wss://westend-asset-hub-rpc.polkadot.io",
+		DestinationBridgeHubEndpoint: "wss://bridge-hub-westend-rpc.dwellir.com",
+		DestinationRelayEndpoint:     "wss://westend-rpc.polkadot.io",
+	})
+	assert.NoError(t, err)
 }

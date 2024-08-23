@@ -26,21 +26,22 @@ var (
 	InvalidParaHead       = errors.New("invalid para head")
 )
 
-func CreateSnapshotClient(endpoint string) (*websocket.PoolConn, *metadata.Instant, func()) {
+func CreateSnapshotClient(endpoint string) (*websocket.PoolConn, func()) {
 	websocket.SetEndpoint(endpoint)
 	// websocket init and set metadata
 	p, err := websocket.Init()
 	if err != nil {
 		panic(err)
 	}
+	return p, func() { websocket.Close() }
+}
+
+func RegDefaultMetadata() *metadata.Instant {
 	raw, err := rpc.GetMetadataByHash(nil)
 	if err != nil {
 		panic(err)
 	}
-	metadataInstant := metadata.RegNewMetadataType(0, raw)
-	return p, metadataInstant, func() {
-		websocket.Close()
-	}
+	return metadata.RegNewMetadataType(0, raw)
 }
 
 const (
@@ -86,11 +87,7 @@ func TrackXcmMessage(extrinsicIndex string, protocol tx.Protocol, originEndpoint
 		"DestEndpoint:", destEndpoint,
 		"RelayEndpoint:", relayEndpoint)
 
-	_, metadataInstant, cancel := CreateSnapshotClient(originEndpoint)
-	chain := checkChain(metadataInstant)
-	if chain == Solo {
-		return nil, errors.New("originEndpoint not parachain or relaychain")
-	}
+	_, cancel := CreateSnapshotClient(originEndpoint)
 	ctx := context.Background()
 	cancel()
 	defer func() {
@@ -98,21 +95,12 @@ func TrackXcmMessage(extrinsicIndex string, protocol tx.Protocol, originEndpoint
 	}()
 	switch protocol {
 	case tx.UMP:
-		if chain != Parachain {
-			return nil, errors.New("originEndpoint not parachain")
-		}
 		u := Ump{ExtrinsicIndex: extrinsicIndex, OriginEndpoint: originEndpoint, DestEndpoint: destEndpoint}
 		return u.Track(ctx)
 	case tx.HRMP:
-		if chain != Parachain {
-			return nil, errors.New("originEndpoint not parachain")
-		}
 		h := Hrmp{extrinsicIndex: extrinsicIndex, originEndpoint: originEndpoint, destEndpoint: destEndpoint, relayChainEndpoint: relayEndpoint, filterCallBack: hrmpFilter}
 		return h.Track(ctx)
 	case tx.DMP:
-		if chain != Relaychain {
-			return nil, errors.New("originEndpoint not relaychain")
-		}
 		d := Dmp{extrinsicIndex: extrinsicIndex, originEndpoint: originEndpoint, destEndpoint: destEndpoint}
 		return d.Track(ctx)
 	default:

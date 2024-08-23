@@ -26,7 +26,8 @@ type Event struct {
 	// block timestamp
 	BlockTime int64 `json:"block_time"`
 
-	TxHash string `json:"tx_hash"`
+	TxHash       string      `json:"tx_hash"`
+	ResourceData interface{} `json:"resource_data"`
 }
 
 type EventParam struct {
@@ -65,9 +66,14 @@ func getEvents(ctx context.Context, p *websocket.PoolConn, blockHash string, met
 }
 
 // find event by event id
-func findEventByEventId(events []Event, index uint, eventId []string) *Event {
+func findEventByEventId(events []Event, index int, eventId []string) *Event {
 	for _, event := range events {
-		if util.StringInSlice(event.EventId, eventId) && event.ExtrinsicIdx == int(index) {
+		if util.StringInSlice(event.EventId, eventId) {
+			if index >= 0 {
+				if event.ExtrinsicIdx != index {
+					continue
+				}
+			}
 			return &event
 		}
 	}

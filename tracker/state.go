@@ -35,12 +35,16 @@ type Inclusion struct {
 }
 
 func PendingAvailability(paraId uint, blockHash string) (*Inclusion, error) {
-	raw, err := rpc.ReadStorage(nil, "paraInclusion", "pendingAvailability", blockHash, types.Encode("U32", uint32(paraId)))
+	raw, err := rpc.ReadStorage(nil, "paraInclusion", "v1", blockHash, types.Encode("U32", uint32(paraId)))
 	if err != nil {
 		return nil, err
 	}
-	var inclusion Inclusion
-	raw.ToAny(&inclusion)
+	var inclusions []Inclusion
+	raw.ToAny(&inclusions)
+	if len(inclusions) == 0 {
+		return nil, nil
+	}
+	var inclusion = inclusions[0]
 	return &inclusion, nil
 }
 
@@ -80,4 +84,24 @@ func timestampNow(blockHash string) (int64, error) {
 		return 0, err
 	}
 	return raw.ToInt64(), nil
+}
+
+type BpParachainsParaInfo struct {
+	BestHeadHash struct {
+		AtRelayBlockNumber uint64 `json:"at_relay_block_number"`
+		HeadHash           string `json:"head_hash"`
+	} `json:"best_head_hash"`
+}
+
+func ParasInfo(module string, paraId uint, blockHash string) (*BpParachainsParaInfo, error) {
+	raw, err := rpc.ReadStorage(nil, module, "parasInfo", blockHash, types.Encode("U32", uint32(paraId)))
+	if err != nil {
+		return nil, err
+	}
+	if raw == "" {
+		return nil, nil
+	}
+	var info BpParachainsParaInfo
+	raw.ToAny(&info)
+	return &info, nil
 }

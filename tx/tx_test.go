@@ -61,3 +61,19 @@ func TestPolkadotToEthereum(t *testing.T) {
 		assert.Len(t, txHash, 66)
 	})
 }
+
+func TestRococoToWestend(t *testing.T) {
+	client := initClient("wss://rococo-asset-hub-rpc.polkadot.io")
+	client.SetKeyRing(AliceSeed2)
+	defer client.Close()
+
+	t.Run("TestRococoToWestend", func(t *testing.T) {
+		txHash, err := client.SendDotKsmChainToken(
+			DestAccountId,
+			1000, &GlobalConsensusNetworkId{Westend: &emptyEnumValue},
+			decimal.New(1, 0),
+		)
+		assert.NoError(t, err)
+		assert.Len(t, txHash, 66)
+	})
+}

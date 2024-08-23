@@ -14,7 +14,7 @@ result of the execution after sending xcm.
 - [x] Cli Support
 - [x] XCM V2,V3,V4 Support
 - [x] Ethereum <=> Polkadot SnowBridge support
-- [ ] Polkadot <=> Kusama bridge 
+- [x] Polkadot <=> Kusama bridge
 
 ## Get Start
 
@@ -38,9 +38,9 @@ docker run -it xcm-tools -h
 cd cmd && go build -o xcm-tools .
 ```
 
-### Usage
+## Usage
 
-#### Installation
+### Installation
 
 ```bash 
 go install github.com/gmajor-encrypt/xcm-tools/cmd@latest 
@@ -57,7 +57,7 @@ commands.
 go run .  -h
 ```
 
-#### Commands
+### Commands
 
 ```
 NAME:
@@ -70,7 +70,7 @@ COMMANDS:
    send           send xcm message
    parse          parse xcm message
    tracker        tracker xcm message transaction
-   trackerBridge  tracker snowBridge message transaction
+   trackerEthBridge  tracker snowBridge message transaction
    help, h        Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
@@ -78,24 +78,80 @@ GLOBAL OPTIONS:
 
 ```
 
-#### Args
+### Args
 
-| Name               | Description                                                                       | Suitable              |
-|--------------------|-----------------------------------------------------------------------------------|-----------------------|
-| dest               | Dest address                                                                      | SendXCM               |
-| amount             | Send xcm transfer amount                                                          | SendXCM               |
-| keyring            | Set sr25519 secret key                                                            | SendXCM               |
-| endpoint           | Set substrate endpoint, only support websocket protocol, like ws:// or wss://     | ALL                   |
-| paraId             | Send xcm transfer amount                                                          | SendXCM               |
-| message            | Parsed xcm message raw data                                                       | Parse                 |
-| protocol           | Xcm protocol, such as UMP,HRMP,DMP                                                | Tracker               |
-| destEndpoint       | Dest chain endpoint, only support websocket protocol, like ws:// or wss://        | Tracker               |
-| extrinsicIndex     | Xcm message extrinsicIndex                                                        | Tracker/trackerBridge |
-| relaychainEndpoint | Relay chain endpoint, only support websocket protocol, like ws:// or wss://       | Tracker/trackerBridge |
-| hash               | Ethereum send token to polkadot transaction hash                                  | trackerBridge         |
-| bridgeHubEndpoint  | BridgeHubEndpoint endpoint, only support websocket protocol, like ws:// or wss:// | trackerBridge         |
-| chainId            | Ethereum chain id                                                                 | EthBridge             |
-| contract           | Erc20 contract address                                                            | EthBridge             |
+#### Send XCM Message
+
+| Name     | Description                                                                   | Suitable            |
+|----------|-------------------------------------------------------------------------------|---------------------|
+| endpoint | Set substrate endpoint, only support websocket protocol, like ws:// or wss:// | ALL                 |
+| dest     | Dest address                                                                  | SendXCM             |
+| amount   | Send xcm transfer amount                                                      | SendXCM             |
+| keyring  | Set sr25519 secret key                                                        | SendXCM             |
+| paraId   | Dest para id                                                                  | SendXCM(DMP & hRMP) |
+
+#### Send Token(SnowBridge)
+
+| Name     | Description                                                                   | Suitable  |
+|----------|-------------------------------------------------------------------------------|-----------|
+| endpoint | Set substrate endpoint, only support websocket protocol, like ws:// or wss:// | ALL       |
+| dest     | Dest address                                                                  | EthBridge |
+| amount   | Send xcm transfer amount                                                      | EthBridge |
+| keyring  | Set sr25519 secret key                                                        | EthBridge |
+| paraId   | Send xcm transfer amount                                                      | EthBridge |
+| chainId  | Ethereum chain id                                                             | EthBridge |
+| contract | Erc20 contract address                                                        | EthBridge |
+
+#### Send S2S Message(polkadot <=>kusama)
+
+| Name      | Description                                                                   | Suitable |
+|-----------|-------------------------------------------------------------------------------|----------|
+| endpoint  | Set substrate endpoint, only support websocket protocol, like ws:// or wss:// | ALL      |
+| dest      | Dest address                                                                  | s2s      |
+| amount    | Send xcm transfer amount                                                      | s2s      |
+| keyring   | Set sr25519 secret key                                                        | s2s      |
+| paraId    | Send xcm transfer amount                                                      | s2s      |
+| chainId   | Ethereum chain id                                                             | s2s      |
+| destChain | dest chain (support polkadot, kusama, rococo, westend )                       | s2s      |
+
+#### Parse Message
+
+| Name     | Description                                                                   | Suitable |
+|----------|-------------------------------------------------------------------------------|----------|
+| endpoint | Set substrate endpoint, only support websocket protocol, like ws:// or wss:// | ALL      |
+| message  | Parsed xcm message raw data                                                   | Parse    |
+
+#### Tracker(HRMP,UMP,DMP)
+
+| Name               | Description                                                                   | Suitable |
+|--------------------|-------------------------------------------------------------------------------|----------|
+| endpoint           | Set substrate endpoint, only support websocket protocol, like ws:// or wss:// | ALL      |
+| protocol           | Xcm protocol, such as UMP,HRMP,DMP                                            | Tracker  |
+| destEndpoint       | Dest chain endpoint, only support websocket protocol, like ws:// or wss://    | Tracker  |
+| extrinsicIndex     | Xcm message extrinsicIndex                                                    | Tracker  |
+| relaychainEndpoint | Relay chain endpoint, only support websocket protocol, like ws:// or wss://   | Tracker  |
+
+#### Tracker SnowBridge
+
+| Name               | Description                                                                       | Suitable         |
+|--------------------|-----------------------------------------------------------------------------------|------------------|
+| endpoint           | Set substrate endpoint, only support websocket protocol, like ws:// or wss://     | ALL              |
+| extrinsicIndex     | Xcm message extrinsicIndex                                                        | trackerEthBridge |
+| relaychainEndpoint | Relay chain endpoint, only support websocket protocol, like ws:// or wss://       | trackerEthBridge |
+| hash               | Ethereum send token to polkadot transaction hash                                  | trackerEthBridge |
+| bridgeHubEndpoint  | BridgeHubEndpoint endpoint, only support websocket protocol, like ws:// or wss:// | trackerEthBridge |
+
+#### Tracker S2S Message(polkadot <=>kusama)
+
+| Name                   | Description                                                                       | Suitable         |
+|------------------------|-----------------------------------------------------------------------------------|------------------|
+| endpoint               | Set substrate endpoint, only support websocket protocol, like ws:// or wss://     | ALL              |
+| extrinsicIndex         | Xcm message extrinsicIndex                                                        | trackerS2SBridge |
+| relaychainEndpoint     | Relay chain endpoint, only support websocket protocol, like ws:// or wss://       | trackerS2SBridge |
+| bridgeHubEndpoint      | BridgeHubEndpoint endpoint, only support websocket protocol, like ws:// or wss:// | trackerS2SBridge |
+| destEndpoint           | dest endpoint, only support websocket protocol, like ws:// or wss://              | trackerS2SBridge |
+| destBridgeHubEndpoint  | destBridgeHub endpoint, only support websocket protocol, like ws:// or wss://     | trackerS2SBridge |
+| destRelaychainEndpoint | destRelaychain endpoint, only support websocket protocol, like ws:// or wss://    | trackerS2SBridge |
 
 #### Example
 
@@ -107,10 +163,12 @@ go run . send DMP --dest 0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a568
 # HRMP
 go run . send HRMP --dest 0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d --amount 10 --keyring 0xe5be9a5092b81bca64be81d212e7f2f9eba183bb7a90954f7b76361f6edb5c0a --endpoint wss://rococo-asset-hub-rpc.polkadot.io --paraId 2087
 # Send bridge message(polkadot to ethereum)
-go run . send EthBridge --dest 0x6EB228b7ab726b8B44892e8e273ACF3dcC9C0492 --amount 10  --keyring 0xe5be9a5092b81bca64be81d212e7f2f9eba183bb7a90954f7b76361f6edb5c0a --endpoint wss://rococo-asset-hub-rpc.polkadot.io --contract 0xfff9976782d46cc05630d1f6ebab18b2324d6b14 --chainId 11155111
+go run . send EthBridge --dest 0x6EB228b7ab726b8B44892e8e273ACF3dcC9C0492 --amount 10  --keyring 0xc0417c253312107d808921fb1dd3b740b64e99794dca74bcc550179f7c42a255 --endpoint wss://rococo-asset-hub-rpc.polkadot.io --contract 0xfff9976782d46cc05630d1f6ebab18b2324d6b14 --chainId 11155111
+# Send S2S message(polkadot to kusama)
+go run . send S2SBridge --paraId 1000 --destChain westend --dest 0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d --amount 10 --keyring 0xc0417c253312107d808921fb1dd3b740b64e99794dca74bcc550179f7c42a255 --endpoint wss://rococo-asset-hub-rpc.polkadot.io
 ```
 
-#### Parse Xcm Message
+### Parse Xcm Message
 
 We provide a function to parse xcm transaction instructions and deserialize the encoded raw message into readable JSON.
 Support XCM V0,V1,V2,V3,V4
@@ -134,7 +192,7 @@ func ParseMessage() {
 
 ```
 
-#### Tracker Xcm Message
+### Tracker Xcm Message
 
 We provide a function to track xcm transaction results. Support protocol UMP,HRMP,DMP.
 
@@ -154,7 +212,7 @@ func TrackerMessage() {
 }
 ```
 
-#### Xcm Client
+### Xcm Client
 
 ```go
 package example
@@ -172,7 +230,7 @@ func New() *tx.Client {
 }
 ```
 
-#### Send Xcm Transfer(simplified)
+### Send Xcm Transfer(simplified)
 
 We provide the following methods to simplify the parameters of sending xcm transfer, so that there is no need to
 construct complex **multiLocation** and **multiAssets**.
@@ -221,9 +279,9 @@ func SendDmpMessage() {
 
 ```
 
-#### Send Xcm Message
+### Send Xcm Message
 
-##### Support Methods
+#### Support Methods
 
 * `LimitedReserveTransferAssets`
 * `LimitedTeleportAssets`
@@ -294,13 +352,11 @@ func main() {
 
 More examples can be found in the [example](./example) or [xcm_test](./tx/xcm_test.go) directory.
 
-#### SnowBridge Support
+### SnowBridge Support
 
 ##### Tracker SnowBridge Message
 
 We provide a function to track snowBridge transaction results(Ethereum <=> Polkadot).
-
-> Tips: Currently, only the ethereum test network sepolia and bridgeHub-rococo bridge have been opened.
 
 ```go
 package main
@@ -318,13 +374,13 @@ func TrackerMessage() {
 	ctx := context.Background()
 
 	// Track Eth => Polkadot
-	_, err = tracker.TrackBridgeMessage(ctx, &tracker.TrackBridgeMessageOptions{Tx: "0x799f01445e2be3103a1a751e33b395c4b894529ce3b320d2fd94c22d4e3d6e01"})
+	_, err = tracker.TrackEthBridgeMessage(ctx, &tracker.TrackBridgeMessageOptions{Tx: "0x799f01445e2be3103a1a751e33b395c4b894529ce3b320d2fd94c22d4e3d6e01"})
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// Track Polkadot => ETH
-	_, err = tracker.TrackBridgeMessage(ctx, &tracker.TrackBridgeMessageOptions{
+	_, err = tracker.TrackEthBridgeMessage(ctx, &tracker.TrackBridgeMessageOptions{
 		ExtrinsicIndex:    "3879712-2",
 		BridgeHubEndpoint: "wss://rococo-bridge-hub-rpc.polkadot.io",
 		OriginEndpoint:    "wss://rococo-rockmine-rpc.polkadot.io",
@@ -354,11 +410,11 @@ func SendEthErc20Token() {
 	client := NewClient(endpoint)
 	client.Conn.SetKeyRing(keyring.New(keyring.Sr25519Type, AliceSeed))
 	defer client.Close()
-	
+
 	destH160 := strings.ToLower("0x6EB228b7ab726b8B44892e8e273ACF3dcC9C0492") // Send to Ethereum address
-	Erc20Contract := "0xfff9976782d46cc05630d1f6ebab18b2324d6b14" // Erc20 contract address
-	amount := decimal.New(1, 0) // Transfer amount
-	
+	Erc20Contract := "0xfff9976782d46cc05630d1f6ebab18b2324d6b14"             // Erc20 contract address
+	amount := decimal.New(1, 0)                                               // Transfer amount
+
 	_, _ = client.SendTokenToEthereum(
 		destH160,
 		Erc20Contract,
@@ -366,6 +422,64 @@ func SendEthErc20Token() {
 		11155111) // Ethereum chain id
 
 }
+```
+
+### Polkadot <=> Kusama Bridge
+
+#### Send S2S Message
+
+```go
+package main
+
+import (
+	"github.com/gmajor-encrypt/xcm-tools/tx"
+	"github.com/itering/substrate-api-rpc/keyring"
+	"log"
+	"strings"
+	"github.com/shopspring/decimal"
+)
+
+// Demo Send S2S Message, this demo is sending a message from rococo to westend
+func Demo() {
+	client := tx.NewClient("")
+	client.SetKeyRing("")
+	defer client.Close()
+
+	beneficiary := "beneficiary Account id"
+	transferAmount := decimal.New(1, 0)
+	txHash, err := client.SendDotKsmChainToken(beneficiary, uint32(1000), tx.ConvertToGlobalConsensusNetworkId("westend"), transferAmount)
+	log.Println(txHash, err)
+}
+
+```
+
+#### Tracker S2S Message
+
+```go
+package main
+
+import (
+	"context"
+	"github.com/gmajor-encrypt/xcm-tools/tracker"
+)
+
+// TrackerMessage Tracker S2S Message(rococo=>westend) with extrinsic_index 5816546-2
+// https://assethub-rococo.subscan.io/extrinsic/5816546-2
+func Demo() {
+	ctx := context.Background()
+	_, err := tracker.TrackS2sBridgeMessage(ctx, &tracker.S2STrackBridgeMessageOptions{
+		ExtrinsicIndex:      "5816546-2",
+		
+		BridgeHubEndpoint:   "wss://rococo-bridge-hub-rpc.polkadot.io",
+		OriginEndpoint:      "wss://rococo-rockmine-rpc.polkadot.io",
+		OriginRelayEndpoint: "wss://rococo-rpc.polkadot.io",
+
+		DestinationEndpoint:          "wss://westend-asset-hub-rpc.polkadot.io",
+		DestinationBridgeHubEndpoint: "wss://bridge-hub-westend-rpc.dwellir.com",
+		DestinationRelayEndpoint:     "wss://westend-rpc.polkadot.io",
+	})
+}
+
 
 ```
 

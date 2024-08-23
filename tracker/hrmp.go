@@ -2,6 +2,7 @@ package tracker
 
 import (
 	"context"
+	"errors"
 	"github.com/gmajor-encrypt/xcm-tools/parse"
 	"github.com/gmajor-encrypt/xcm-tools/tx"
 	"github.com/itering/scale.go/types"
@@ -27,7 +28,7 @@ type Hrmp struct {
 
 func (h *Hrmp) Track(ctx context.Context) (*Event, error) {
 	// origin parachain
-	client, metadataInstant, closeClient := CreateSnapshotClient(h.originEndpoint)
+	client, closeClient := CreateSnapshotClient(h.originEndpoint)
 
 	extrinsic := findOutBlockByExtrinsicIndex(h.extrinsicIndex)
 	if extrinsic == nil {
@@ -45,15 +46,19 @@ func (h *Hrmp) Track(ctx context.Context) (*Event, error) {
 		return nil, err
 	}
 
-	metadataInstant = metadata.RegNewMetadataType(0, raw)
+	metadataInstant := metadata.RegNewMetadataType(0, raw)
 
 	metadataStruct := types.MetadataStruct(*metadataInstant)
+	chain := checkChain(metadataInstant)
+	if chain == Solo {
+		return nil, errors.New("originEndpoint not parachain or relaychain")
+	}
 	events, err := getEvents(ctx, client, blockHash, &metadataStruct)
 	if err != nil {
 		return nil, err
 	}
 
-	event := findEventByEventId(events, extrinsic.Index, []string{"XcmpMessageSent"})
+	event := findEventByEventId(events, int(extrinsic.Index), []string{"XcmpMessageSent"})
 	if event == nil {
 		return nil, NotfoundXcmMessageErr
 	}
@@ -102,7 +107,7 @@ func (h *Hrmp) Track(ctx context.Context) (*Event, error) {
 	types.Clean()
 
 	// relay chain
-	client, _, closeClient = CreateSnapshotClient(h.relayChainEndpoint)
+	client, closeClient = CreateSnapshotClient(h.relayChainEndpoint)
 	nextBlockHash, err = rpc.GetChainGetBlockHash(client.Conn, relayChainBlockNum)
 	if err != nil {
 		return nil, err
@@ -125,8 +130,9 @@ func (h *Hrmp) Track(ctx context.Context) (*Event, error) {
 		if err != nil {
 			return nil, err
 		}
-		log.Println("Find nextBlockHash,start fetch PendingAvailability", nextBlockHash)
+		log.Printf("Find nextBlockHash %s, block num %d,start fetch PendingAvailability \n", nextBlockHash, paraHeadBlockNum)
 		pendingAvailability, err := PendingAvailability(destParaId, nextBlockHash)
+
 		if err != nil {
 			return nil, err
 		}
@@ -137,13 +143,16 @@ func (h *Hrmp) Track(ctx context.Context) (*Event, error) {
 			break
 		}
 	}
+	if paraHead == "" {
+		return nil, InvalidParaHead
+	}
 
 	log.Println("Get para block hash", paraHead)
 	closeClient()
 	types.Clean()
 
 	// dest parachain
-	client, _, closeClient = CreateSnapshotClient(h.destEndpoint)
+	client, closeClient = CreateSnapshotClient(h.destEndpoint)
 	defer closeClient()
 	raw, err = rpc.GetMetadataByHash(nil, paraHead)
 	if err != nil {
@@ -155,6 +164,7 @@ func (h *Hrmp) Track(ctx context.Context) (*Event, error) {
 	retry = 0
 	var messageId string
 	for {
+		log.Printf("start check block %s\n", paraHead)
 		events, err = getEvents(ctx, client, paraHead, &metadataStruct)
 		if err != nil {
 			return nil, err
@@ -165,6 +175,7 @@ func (h *Hrmp) Track(ctx context.Context) (*Event, error) {
 		}
 		h.messageId = messageId
 		if event != nil {
+			closeClient()
 			return event, nil
 		}
 		// check next block
@@ -203,6 +214,16 @@ func hrmpFilter(events []Event, i *tx.VersionedXcm, messageHash, _ string) (*Eve
 				log.Printf("Find HRMP messageHash %s,messageId %s result %s", messageHash, messageId, event.EventId)
 				return event, messageId, nil
 			}
+		}
+	}
+	// messageQueue (Processed)
+	event = findEventByEventId(events, 0, []string{"Processed"})
+	if event != nil {
+		value := event.Params[0].Value.(string)
+		// Find by messageId
+		if value == messageId {
+			log.Printf("Find HRMP messageHash %s,messageId %s result %t", messageHash, messageId, event.Params[3].Value)
+			return event, messageId, nil
 		}
 	}
 	return nil, "", nil

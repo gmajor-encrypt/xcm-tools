@@ -3,6 +3,7 @@ package tx
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 )
 
 type VersionedMultiLocation struct {
@@ -190,6 +191,24 @@ type GlobalConsensusNetworkId struct {
 	BitcoinCore      *string `json:"BitcoinCore,omitempty"`
 	BitcoinCash      *string `json:"BitcoinCash,omitempty"`
 	PolkadotBulletin *string `json:"PolkadotBulletin,omitempty"`
+}
+
+var emptyEnumValue = "NULL"
+
+func ConvertToGlobalConsensusNetworkId(network string) *GlobalConsensusNetworkId {
+	network = strings.ToLower(network)
+	switch network {
+	case "polkadot":
+		return &GlobalConsensusNetworkId{Polkadot: &emptyEnumValue}
+	case "kusama":
+		return &GlobalConsensusNetworkId{Kusama: &emptyEnumValue}
+	case "westend":
+		return &GlobalConsensusNetworkId{Westend: &emptyEnumValue}
+	case "rococo":
+		return &GlobalConsensusNetworkId{Rococo: &emptyEnumValue}
+	default:
+		panic(fmt.Sprintf("unsupported network: %s", network))
+	}
 }
 
 func (v *V3MultiLocation) GetParaId() uint {
