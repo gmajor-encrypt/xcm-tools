@@ -39,7 +39,7 @@ var (
 // Subscan api endpoint name, for example: bridgehub-rococo,bridgehub-polkadot, bridgehub-westend, bridgehub-kusama
 
 func (t *TrackBridgeMessageOptions) bridgeHubName() string {
-	const defaultBridgeHubName = "bridgehub-rococo"
+	var defaultBridgeHubName = bridgeHubRococo
 	if t.BridgeHubName != "" {
 		if !util.InSlice(t.BridgeHubName, []string{bridgeHubRococo, bridgeHubWestend, bridgeHubPolkadot, bridgeHubKusama}) {
 			panic(fmt.Sprintf("bridgeHubName %s is not supported", t.BridgeHubName))
@@ -194,7 +194,7 @@ func TrackEthBridgeMessage(ctx context.Context, opt *TrackBridgeMessageOptions) 
 	}
 	log.Println("Get etherStartBlockNum", etherStartBlockNum)
 
-	logs, err := util.EtherscanGetLogs(ctx, isPolkadot, uint64(etherStartBlockNum), bridgeContract[opt.BridgeHubName], InboundMessageDispatchedTopic, 1, 1000)
+	logs, err := util.EtherscanGetLogs(ctx, isPolkadot, uint64(etherStartBlockNum), bridgeContract[opt.bridgeHubName()], InboundMessageDispatchedTopic, 1, 1000)
 	if err != nil {
 		return nil, err
 	}

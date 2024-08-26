@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	EtherscanAPIKey = "5D91FZ48V3XPNV58ZSNAYBBWS14K3GGSZC"
+	EtherscanAPIKey = "46K2QRJJ5KBAI7BBPK8CPGSYKEWS7ZAJEU"
 )
 
 func etherscanAPIBaseURL(isMainnet bool) string {
@@ -98,6 +98,7 @@ func EthGetTransactionReceipt(ctx context.Context, isMainnet bool, hash string) 
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println(string(body))
 	var txn EtherscanProxyRes[EtherscanTransactionReceipt]
 	if err = json.Unmarshal(body, &txn); err != nil {
 		return nil, err
