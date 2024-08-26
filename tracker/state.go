@@ -2,7 +2,9 @@ package tracker
 
 import (
 	"github.com/itering/scale.go/types"
+	"github.com/itering/substrate-api-rpc/metadata"
 	"github.com/itering/substrate-api-rpc/rpc"
+	"strings"
 )
 
 func HRMPWatermark(blockHash string) (int, error) {
@@ -34,17 +36,37 @@ type Inclusion struct {
 	} `json:"descriptor"`
 }
 
-func PendingAvailability(paraId uint, blockHash string) (*Inclusion, error) {
-	raw, err := rpc.ReadStorage(nil, "paraInclusion", "v1", blockHash, types.Encode("U32", uint32(paraId)))
+// PendingAvailability Candidates pending availability by `ParaId
+// after runtime 1010000,pendingAvailability rename to v1
+func PendingAvailability(paraId uint, blockHash string, m *metadata.Instant) (*Inclusion, error) {
+	// check extrinsic call
+	callName := "pendingAvailability"
+	for _, module := range m.Metadata.Modules {
+		if module.Name == "paraInclusion" {
+			for _, call := range module.Calls {
+				if strings.EqualFold(call.Name, "v1") {
+					callName = "v1"
+				}
+			}
+		}
+	}
+	raw, err := rpc.ReadStorage(nil, "paraInclusion", callName, blockHash, types.Encode("U32", uint32(paraId)))
 	if err != nil {
 		return nil, err
 	}
-	var inclusions []Inclusion
-	raw.ToAny(&inclusions)
-	if len(inclusions) == 0 {
-		return nil, nil
+	// v1 call
+	if callName == "v1" {
+		var inclusions []Inclusion
+		raw.ToAny(&inclusions)
+		if len(inclusions) == 0 {
+			return nil, nil
+		}
+		var inclusion = inclusions[0]
+		return &inclusion, nil
 	}
-	var inclusion = inclusions[0]
+
+	var inclusion Inclusion
+	raw.ToAny(&inclusion)
 	return &inclusion, nil
 }
 

@@ -107,14 +107,17 @@ func (d *Dmp) Track(ctx context.Context) (*Event, error) {
 		if err != nil {
 			return nil, err
 		}
-		log.Println("Find nextBlockHash,start fetch PendingAvailability", nextBlockHash)
-		pendingAvailability, err := PendingAvailability(destParaId, nextBlockHash)
+		log.Printf("Find %d nextBlockHash,start fetch PendingAvailability %s \n", paraHeadBlockNum, nextBlockHash)
+		pendingAvailability, err := PendingAvailability(destParaId, nextBlockHash, metadataInstant)
 		if err != nil {
 			return nil, err
 		}
-		paraHead = pendingAvailability.Descriptor.ParaHead
 		retry++
 		paraHeadBlockNum++
+		if pendingAvailability == nil {
+			continue
+		}
+		paraHead = pendingAvailability.Descriptor.ParaHead
 		if paraHead != "" || retry > 5 {
 			break
 		}

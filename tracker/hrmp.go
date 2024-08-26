@@ -131,10 +131,14 @@ func (h *Hrmp) Track(ctx context.Context) (*Event, error) {
 			return nil, err
 		}
 		log.Printf("Find nextBlockHash %s, block num %d,start fetch PendingAvailability \n", nextBlockHash, paraHeadBlockNum)
-		pendingAvailability, err := PendingAvailability(destParaId, nextBlockHash)
+		pendingAvailability, err := PendingAvailability(destParaId, nextBlockHash, metadataInstant)
 
 		if err != nil {
 			return nil, err
+		}
+		if pendingAvailability == nil {
+			paraHeadBlockNum++
+			continue
 		}
 		paraHead = pendingAvailability.Descriptor.ParaHead
 		retry++
