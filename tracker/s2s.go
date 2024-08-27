@@ -14,6 +14,7 @@ import (
 	"strings"
 )
 
+// S2STrackBridgeMessageOptions is the options for TrackS2sBridgeMessage
 type S2STrackBridgeMessageOptions struct {
 	// substrate => substrate message extrinsic index
 	ExtrinsicIndex string
@@ -34,23 +35,30 @@ type S2STrackBridgeMessageOptions struct {
 }
 
 type ReceivedMessagesType struct {
-	Lane           string           `json:"lane"`
-	ReceiveResults []ReceiveResults `json:"receive_results"`
+	Lane           string `json:"lane"`
+	ReceiveResults []struct {
+		Col1 int `json:"col1"`
+	} `json:"receive_results"`
 }
 
-type ReceiveResults struct {
-	Col1 int `json:"col1"`
+// bridgeParaIds is the map of bridge module name and paraId
+var bridgeParaIds = map[string]uint{
+	// rococo
+	"BridgeRococoParachains": 1013,
+	// westend
+	"bridgeWestendParachains": 1002,
+	// kusama
+	"bridgeKusamaParachains": 1002,
+	// polkadot
+	"bridgePolkadotParachains": 1002,
 }
 
+// TrackS2sBridgeMessage tracks the s2s bridge message
+// flow: parachain => relay chain => bridge hub => dest bridge hub => dest relay chain => dest parachain
 func TrackS2sBridgeMessage(ctx context.Context, opt *S2STrackBridgeMessageOptions) (*Event, error) {
 
+	// checkBridgeModule checks the bridge module in metadata
 	var checkBridgeModule = func(metadataInstant *metadata.Instant) (string, uint) {
-		bridgeParaIds := map[string]uint{
-			"BridgeRococoParachains":   1013,
-			"bridgeWestendParachains":  1002,
-			"bridgeKusamaParachains":   1002,
-			"bridgePolkadotParachains": 1002,
-		}
 		for moduleName, paraId := range bridgeParaIds {
 			for _, module := range metadataInstant.Metadata.Modules {
 				if strings.EqualFold(module.Name, moduleName) {
@@ -85,6 +93,7 @@ func TrackS2sBridgeMessage(ctx context.Context, opt *S2STrackBridgeMessageOption
 			return nil, "", nil
 		}
 
+		// get bridge lane_id and nonce
 		// MessageAccepted(lane_id,nonce)
 		messageAcceptedEvent := findEventByEventId(events, 0, []string{"MessageAccepted"})
 		if messageAcceptedEvent == nil {
@@ -98,6 +107,7 @@ func TrackS2sBridgeMessage(ctx context.Context, opt *S2STrackBridgeMessageOption
 		return event, messageId, nil
 	}
 	origin.filterCallBack = filter
+	// common hrmp filter
 	event, err := origin.Track(ctx)
 	if err != nil {
 		return nil, err
@@ -137,6 +147,7 @@ func TrackS2sBridgeMessage(ctx context.Context, opt *S2STrackBridgeMessageOption
 	var retry int
 
 OuterLoop:
+	// loop to find destChainExtrinsicIndex
 	for {
 		log.Println("start check block", currenBlock, paraHead)
 		events, err := getEvents(ctx, client, paraHead, &metadataStruct)
@@ -152,6 +163,7 @@ OuterLoop:
 				lane := receivedMessages.Lane
 				for _, receiveResult := range receivedMessages.ReceiveResults {
 					nonce := receiveResult.Col1
+					// match nonce and lane
 					if nonce == resourceData.Nonce && lane == resourceData.LaneId {
 						destChainExtrinsicIndex = fmt.Sprintf("%d-%d", currenBlock, messagesReceivedEvent.ExtrinsicIdx)
 						break OuterLoop
@@ -191,5 +203,6 @@ OuterLoop:
 		relayChainEndpoint: opt.DestinationRelayEndpoint,
 	}
 	destination.filterCallBack = hrmpFilter
+	// common hrmp filter
 	return destination.Track(ctx)
 }
