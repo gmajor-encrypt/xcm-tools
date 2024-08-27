@@ -63,7 +63,7 @@ func TestTrackBridgeMessage(t *testing.T) {
 // https://rococo.subscan.io/xcm_message/rococo-907f951e05c3516ba5dc3ee37838321a5b28fc34
 func TestTrackS2sBridgeMessage(t *testing.T) {
 	ctx := context.Background()
-	_, err := TrackS2sBridgeMessage(ctx, &S2STrackBridgeMessageOptions{
+	event, err := TrackS2sBridgeMessage(ctx, &S2STrackBridgeMessageOptions{
 		ExtrinsicIndex:      "5816546-2",
 		BridgeHubEndpoint:   "wss://rococo-bridge-hub-rpc.polkadot.io",
 		OriginEndpoint:      "wss://rococo-rockmine-rpc.polkadot.io",
@@ -74,4 +74,6 @@ func TestTrackS2sBridgeMessage(t *testing.T) {
 		DestinationRelayEndpoint:     "wss://westend-rpc.polkadot.io",
 	})
 	assert.NoError(t, err)
+	assert.NotNil(t, event)
+	assert.Equal(t, "0x11e1c09b4f6aece0bfa6c1678faf192b6808540c97a6855230f8af3e2eb83528", event.Params[0].Value.(string))
 }

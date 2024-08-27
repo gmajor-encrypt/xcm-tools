@@ -42,10 +42,11 @@ func PendingAvailability(paraId uint, blockHash string, m *metadata.Instant) (*I
 	// check extrinsic call
 	callName := "pendingAvailability"
 	for _, module := range m.Metadata.Modules {
-		if module.Name == "paraInclusion" {
-			for _, call := range module.Calls {
-				if strings.EqualFold(call.Name, "v1") {
+		if module.Name == "ParaInclusion" {
+			for _, st := range module.Storage {
+				if strings.EqualFold(st.Name, "v1") {
 					callName = "v1"
+					break
 				}
 			}
 		}

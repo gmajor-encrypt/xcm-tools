@@ -191,6 +191,5 @@ OuterLoop:
 		relayChainEndpoint: opt.DestinationRelayEndpoint,
 	}
 	destination.filterCallBack = hrmpFilter
-	_, err = destination.Track(ctx)
-	return nil, err
+	return destination.Track(ctx)
 }
