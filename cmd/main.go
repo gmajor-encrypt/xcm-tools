@@ -123,7 +123,7 @@ func subCommands() []cli.Command {
 						if err != nil {
 							return err
 						}
-						log.Print("send HRMP message success, tx hash: ", txHash)
+						log.Print("send DMP message success, tx hash: ", txHash)
 						return nil
 					},
 				},
@@ -152,7 +152,7 @@ func subCommands() []cli.Command {
 						if err != nil {
 							return err
 						}
-						log.Print("send HRMP message success, tx hash: ", txHash)
+						log.Print("send EthBridge message success, tx hash: ", txHash)
 						return nil
 					},
 				},
@@ -186,7 +186,7 @@ func subCommands() []cli.Command {
 						if err != nil {
 							return err
 						}
-						log.Print("send HRMP message success, tx hash: ", txHash)
+						log.Print("send S2SBridge message success, tx hash: ", txHash)
 						return nil
 					},
 				},
