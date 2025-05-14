@@ -3,7 +3,6 @@ package tx
 import (
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
-	"strings"
 	"testing"
 )
 
@@ -19,7 +18,7 @@ func Test_Client(t *testing.T) {
 }
 
 func TestXcmTransfer(t *testing.T) {
-	client := initClient("wss://rococo-asset-hub-rpc.polkadot.io")
+	client := initClient("wss://westend-asset-hub-rpc.polkadot.io")
 	defer client.Close()
 
 	t.Run("Test_XCM_Ump_Transfer", func(t *testing.T) {
@@ -36,7 +35,7 @@ func TestXcmTransfer(t *testing.T) {
 }
 
 func TestDmpTransfer(t *testing.T) {
-	client := initClient("wss://rococo-rpc.polkadot.io")
+	client := initClient("wss://westend-rpc.dwellir.com")
 	defer client.Close()
 
 	t.Run("Test_XCM_Dmp_Transfer", func(t *testing.T) {
@@ -46,34 +45,34 @@ func TestDmpTransfer(t *testing.T) {
 	})
 }
 
-func TestPolkadotToEthereum(t *testing.T) {
-	client := initClient("wss://rococo-asset-hub-rpc.polkadot.io")
-	client.SetKeyRing(AliceSeed2)
-	defer client.Close()
-	destH160 := strings.ToLower("0x6EB228b7ab726b8B44892e8e273ACF3dcC9C0492")
-	t.Run("Test_XCM_To_Ethereum", func(t *testing.T) {
-		txHash, err := client.SendTokenToEthereum(
-			destH160,
-			"0xfff9976782d46cc05630d1f6ebab18b2324d6b14",
-			decimal.New(5000000000, 0),
-			11155111)
-		assert.NoError(t, err)
-		assert.Len(t, txHash, 66)
-	})
-}
+// func TestPolkadotToEthereum(t *testing.T) {
+// 	client := initClient("wss://rococo-asset-hub-rpc.polkadot.io")
+// 	client.SetKeyRing(AliceSeed2)
+// 	defer client.Close()
+// 	destH160 := strings.ToLower("0x6EB228b7ab726b8B44892e8e273ACF3dcC9C0492")
+// 	t.Run("Test_XCM_To_Ethereum", func(t *testing.T) {
+// 		txHash, err := client.SendTokenToEthereum(
+// 			destH160,
+// 			"0xfff9976782d46cc05630d1f6ebab18b2324d6b14",
+// 			decimal.New(5000000000, 0),
+// 			11155111)
+// 		assert.NoError(t, err)
+// 		assert.Len(t, txHash, 66)
+// 	})
+// }
 
-func TestRococoToWestend(t *testing.T) {
-	client := initClient("wss://rococo-asset-hub-rpc.polkadot.io")
-	client.SetKeyRing(AliceSeed2)
-	defer client.Close()
-
-	t.Run("TestRococoToWestend", func(t *testing.T) {
-		txHash, err := client.SendDotKsmChainToken(
-			DestAccountId,
-			1000, &GlobalConsensusNetworkId{Westend: &emptyEnumValue},
-			decimal.New(1, 0),
-		)
-		assert.NoError(t, err)
-		assert.Len(t, txHash, 66)
-	})
-}
+// func TestRococoToWestend(t *testing.T) {
+// 	client := initClient("wss://rococo-asset-hub-rpc.polkadot.io")
+// 	client.SetKeyRing(AliceSeed2)
+// 	defer client.Close()
+//
+// 	t.Run("TestRococoToWestend", func(t *testing.T) {
+// 		txHash, err := client.SendDotKsmChainToken(
+// 			DestAccountId,
+// 			1000, &GlobalConsensusNetworkId{Westend: &emptyEnumValue},
+// 			decimal.New(1, 0),
+// 		)
+// 		assert.NoError(t, err)
+// 		assert.Len(t, txHash, 66)
+// 	})
+// }

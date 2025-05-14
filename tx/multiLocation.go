@@ -10,6 +10,7 @@ type VersionedMultiLocation struct {
 	V1 *V1MultiLocation `json:"V1,omitempty"`
 	V2 *V1MultiLocation `json:"V2,omitempty"`
 	V3 *V3MultiLocation `json:"V3,omitempty"`
+	V4 *V3MultiLocation `json:"V4,omitempty"`
 }
 
 func (v *VersionedMultiLocation) GetParaId() uint {

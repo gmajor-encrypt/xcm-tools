@@ -19,11 +19,9 @@ func SimplifyMultiLocationParaId(paraId uint32) *VersionedMultiLocation {
 // SimplifyMultiLocationRelayChain Simplify parent relay chain to VersionedMultiLocation
 func SimplifyMultiLocationRelayChain() *VersionedMultiLocation {
 	return &VersionedMultiLocation{
-		V2: &V1MultiLocation{
-			Interior: V0MultiLocation{
-				Here: "NULL",
-			},
-			Parents: 1,
+		V3: &V3MultiLocation{
+			Parents:  1,
+			Interior: V3MultiLocationJunctions{Here: "NULL"},
 		},
 	}
 }
@@ -31,29 +29,28 @@ func SimplifyMultiLocationRelayChain() *VersionedMultiLocation {
 // SimplifyMultiLocationAccountId32 Simplify accountId to VersionedMultiLocation
 func SimplifyMultiLocationAccountId32(accountId string) *VersionedMultiLocation {
 	return &VersionedMultiLocation{
-		V2: &V1MultiLocation{
-			Interior: V0MultiLocation{
-				X1: &XCMJunction{
-					AccountId32: &XCMJunctionAccountId32{
-						Network: Enum{
-							"Any": "NULL",
-						},
-						Id: accountId,
+		V4: &V3MultiLocation{
+			Interior: V3MultiLocationJunctions{
+				X1: &XCMJunctionV3{
+					AccountId32: &XCMJunctionV3AccountId32{
+						Id:      accountId,
+						Network: nil,
 					},
 				},
 			},
 			Parents: 0,
-		}}
+		},
+	}
 }
 
 // SimplifyMultiAssets Simplify sovereignty token to MultiAssets
 func SimplifyMultiAssets(amount decimal.Decimal) *MultiAssets {
 	return &MultiAssets{
-		V2: []V2MultiAssets{
+		V3: []V3MultiAssets{
 			{
-				Id: AssetsId{
-					Concrete: &V1MultiLocation{
-						Interior: V0MultiLocation{Here: "NULL"},
+				Id: AssetsIdV3{
+					Concrete: &V3MultiLocation{
+						Interior: V3MultiLocationJunctions{Here: "NULL"},
 						Parents:  1,
 					},
 				},

@@ -20,7 +20,7 @@ result of the execution after sending xcm.
 
 ### Requirement
 
-1. Go 1.20+
+1. Go 1.23+
 2. docker(optional)
 
 ### Build
@@ -112,7 +112,7 @@ GLOBAL OPTIONS:
 | keyring   | Set sr25519 secret key                                                        | s2s      |
 | paraId    | Send xcm transfer amount                                                      | s2s      |
 | chainId   | Ethereum chain id                                                             | s2s      |
-| destChain | dest chain (support polkadot, kusama, rococo, westend )                       | s2s      |
+| destChain | dest chain (support polkadot, kusama, westend )                               | s2s      |
 
 #### Parse Message
 

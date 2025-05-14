@@ -167,7 +167,7 @@ func subCommands() []cli.Command {
 						},
 						cli.StringFlag{
 							Name:     "destChain",
-							Usage:    "dest chain, support polkadot, kusama, rococo, westend",
+							Usage:    "dest chain, support polkadot, kusama, westend",
 							Required: true,
 						},
 					}, sendFlag...),

@@ -15,10 +15,10 @@ func TestHRMPWatermark(t *testing.T) {
 }
 
 func TestParasInfo(t *testing.T) {
-	_, closeF := CreateSnapshotClient("wss://rococo-bridge-hub-rpc.polkadot.io")
+	_, closeF := CreateSnapshotClient("wss://polkadot-bridge-hub-rpc.polkadot.io")
 	_ = RegDefaultMetadata()
-	paraInfo, err := ParasInfo("bridgeWestendParachains", 1002, "0x332184c37060ffaa3986cd142354bc8c34dc06146ee65608d4533169b389e37d")
+	paraInfo, err := ParasInfo("bridgeKusamaParachains", 1002, "0x18c4e703423958f0f5571362db411b1bf386822059ae0cd948163f16aa9c1975")
 	assert.NoError(t, err)
-	assert.Equal(t, paraInfo.BestHeadHash.HeadHash, "0x315c4f176ead8620140d90af90991092fd401644509a899290fdd240d08cfd54")
+	assert.Equal(t, paraInfo.BestHeadHash.HeadHash, "0xd8e88896f7dd8cc280e4cc337f49c3048ed3bbca6cae9fb6afaeef905aa6577c")
 	closeF()
 }

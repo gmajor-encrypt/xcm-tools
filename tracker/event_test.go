@@ -3,6 +3,8 @@ package tracker
 import (
 	"context"
 	"github.com/itering/scale.go/types"
+	"github.com/itering/substrate-api-rpc/metadata"
+	"github.com/itering/substrate-api-rpc/rpc"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -34,7 +36,6 @@ func Test_getEventsFromChain(t *testing.T) {
 
 func Test_getEvents(t *testing.T) {
 	client, closeClient := CreateSnapshotClient("wss://moonbeam-rpc.dwellir.com")
-	metadataInstant := RegDefaultMetadata()
 	defer closeClient()
 	ctx := context.TODO()
 	cases := []struct {
@@ -49,8 +50,14 @@ func Test_getEvents(t *testing.T) {
 			EventsCount: 53,
 		},
 	}
-	metadataStruct := types.MetadataStruct(*metadataInstant)
+
 	for _, v := range cases {
+		metadataRaw, err := rpc.GetMetadataByHash(nil, v.blockHash)
+		if err != nil {
+			panic(err)
+		}
+		metadataInstant := metadata.RegNewMetadataType(0, metadataRaw)
+		metadataStruct := types.MetadataStruct(*metadataInstant)
 		raw, err := getEvents(ctx, client, v.blockHash, &metadataStruct)
 		assert.NoError(t, err)
 
